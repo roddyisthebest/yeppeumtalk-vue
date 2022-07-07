@@ -24,7 +24,7 @@
         </router-link>
       </div>
     </div>
-    <div class="container">
+    <div class="container" id="top">
       <nav
         :style="{ width: screen.width > 500 ? '470px' : 'calc(100vw - 30px)' }"
       >
@@ -33,7 +33,7 @@
         </button>
       </nav>
       <router-view :style="{ paddingTop: '80px' }" />
-      <footer>
+      <footer :style="{ paddingBottom: bottomPadding ? '230px' : '0px' }">
         <div id="nav-bar">
           <router-link to="/" class="button">
             <span class="text">개인정보처리방침</span>
@@ -52,6 +52,9 @@
           >
         </div>
       </footer>
+      <button @click="goUp" class="goUpButton">
+        <font-awesome-icon icon="fa-solid fa-up-long" />
+      </button>
     </div>
   </div>
 </template>
@@ -65,6 +68,7 @@ export default Vue.extend({
     return {
       screen: useScreen(),
       navigation: false,
+      bottomPadding: false,
     };
   },
   methods: {
@@ -76,12 +80,32 @@ export default Vue.extend({
         document.body.style.overflow = 'hidden';
       }
     },
+    goUp() {
+      scrollTo({ top: 0, behavior: 'smooth' });
+    },
+  },
+  created() {
+    console.log(this);
+  },
+  watch: {
+    $route(to, from) {
+      if (to.name === 'home') {
+        if (this.bottomPadding) {
+          this.bottomPadding = false;
+        }
+      } else {
+        if (!this.bottomPadding) {
+          this.bottomPadding = true;
+        }
+      }
+    },
   },
 });
 </script>
 <style lang="scss">
 body {
   margin: 0;
+  min-width: 300px;
 }
 
 #app {
@@ -97,7 +121,7 @@ body {
 .container {
   max-width: 500px;
   width: 100%;
-
+  position: relative;
   .navigation-container {
     width: 100%;
     height: 100vh;
@@ -115,7 +139,7 @@ body {
       .text {
         font-size: 25px;
         color: black;
-        font-weight: 400;
+        font-weight: 500;
       }
       .icon {
         font-size: 25px;
@@ -128,7 +152,7 @@ nav {
   position: fixed;
   z-index: 100;
   background-color: #feca1f;
-  width: 470px;
+  width: 640px;
   height: 80px;
   display: flex;
   padding: 0 15px;
@@ -147,7 +171,22 @@ nav {
     cursor: pointer;
   }
 }
+.goUpButton {
+  position: fixed;
+  left: 30px;
+  bottom: 20px;
+  border: none;
+  background-color: #aeaeae;
+  width: 30px;
+  height: 30px;
+  border-radius: 20px;
+  opacity: 0.6;
+  color: white;
+  font-size: 15px;
+  cursor: pointer;
 
+  /* top: 20px; */
+}
 footer {
   #nav-bar {
     height: 50px;
@@ -175,7 +214,7 @@ footer {
     }
   }
   #info-wrapper {
-    background-color: #f5f5f5;
+    background-color: #ededed;
 
     height: 110px;
     display: flex;

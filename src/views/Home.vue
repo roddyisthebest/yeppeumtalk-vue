@@ -5,36 +5,19 @@
         <div class="text">#예뻐지는 시간</div>
       </div>
     </div>
-    <div class="scroll-slide">
-      <div
-        class="scrolling-wrapper-flexbox"
-        :style="{ transform: `translateX(${x}px)` }"
-      >
-        <router-link
-          to="/"
-          class="card"
-          v-for="index in 6"
-          :key="index"
-        ></router-link>
-      </div>
-    </div>
-    <div class="scroll-bar">
-      <span
-        v-for="index in 6"
-        :key="index"
-        class="scrollButton"
-        :class="moving === index - 1 ? 'clicked' : 'not-clicked'"
-        @click="setLocation(index - 1)"
-      ></span>
-    </div>
+    <Slide />
     <div class="contents-wrapper">
       <div
         class="content"
         v-for="index in 6"
         :key="index"
-        :style="{ height: screen.width > 500 ? `250px` : `47.5vw` }"
+        :style="{ height: screen.width > 500 ? `238px` : `47.5vw` }"
       >
-        <router-link to="" class="anchor"></router-link>
+        <router-link :to="`/detail/${index}`" class="anchor">
+          <img :src="require('@/assets/square.jpg')" class="img" alt=""
+        >
+        <span class="border"></span>
+        </img></router-link>
       </div>
     </div>
     <div class="page-bar">
@@ -56,62 +39,19 @@
 <script lang="ts">
 import Vue from 'vue';
 import { useScreen } from 'vue-screen';
-
+import Slide from '../components/Slide.vue';
 export default Vue.extend({
   name: 'HomeView',
   data: () => ({
-    image: ['https://i.stack.imgur.com/nGzAB.png'],
-    x: 50,
     screen: useScreen(),
-    power: 410,
-    moving: 0,
   }),
   methods: {
-    setMove() {
-      this.$data.x -= this.power;
-    },
-    setLocation(moving: number) {
-      this.moving = moving;
-      if (screen.width > 500) {
-        this.$data.x = 50 - 410 * moving;
-      } else {
-        this.$data.x =
-          (screen.width - screen.width * 0.8) / 2 -
-          (screen.width * 0.8 + 10) * moving;
-      }
+    scrollToTop() {
+      window.scrollTo(0, 0);
     },
   },
-  created() {
-    if (screen.width < 500) {
-      this.$data.x = (screen.width - screen.width * 0.8) / 2;
-      this.power = screen.width * 0.8 + 10;
-    }
-    setInterval(() => {
-      this.moving += 1;
-      if (this.moving > 5) {
-        if (screen.width < 500) {
-          this.x = (screen.width - screen.width * 0.8) / 2;
-        } else {
-          this.x = 50;
-        }
-        this.moving = 0;
-      } else {
-        this.setMove();
-      }
-    }, 5000);
-  },
-  watch: {
-    'screen.width': function (width: number) {
-      if (width < 500) {
-        this.$data.x = (screen.width - screen.width * 0.8) / 2;
-        this.power = screen.width * 0.8 + 10;
-        this.moving = 0;
-      } else {
-        this.$data.x = 40;
-        this.power = 410;
-        this.moving = 0;
-      }
-    },
+  components: {
+    Slide,
   },
 });
 </script>
@@ -195,26 +135,48 @@ export default Vue.extend({
 .contents-wrapper {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px 10px;
-  justify-content: space-between;
+    justify-content: space-evenly;
+
   margin-top: 30px;
   width: 100%;
+  
   .content {
     $width: calc(50% - 5px);
     width: $width;
     display: flex;
+    /* &:nth-child(even) {
+      align-items: center;
+      justify-content: flex-start;
+    }
+    &:nth-child(odd) {
+      align-items: center;
+      justify-content: flex-end;
+    } */
     align-items: center;
     justify-content: center;
     .anchor {
-      width: 95%;
-      height: 95%;
-      background-color: black;
-      border-radius: 20px;
-      border: 1px solid black;
-      &:hover {
-        border: 5px solid #ff3e9b;
+      width: 93%;
+      height: 93%;
+      border-radius: 30px;
+      /* border: 10px solid transparent; */
+      &:hover{
+        border:10px solid #FF3E9B;
       }
-      transition: all 300ms ease;
+      border:10px solid transparent;
+
+      .img {
+        width: 100%;
+        height: 100%;
+        border-radius: 20px;
+        transition: all 150ms ease;
+        .border {
+          width: 100%;
+          height: 100%;
+          border-radius: 20px;
+          position: absolute;
+          border: 5px solid black;
+        }
+      }
     }
   }
 }
