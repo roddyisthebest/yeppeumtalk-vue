@@ -1,6 +1,11 @@
 <template>
-  <div>
-    <div class="wrapper">
+  <div id="container-main">
+    <div class="header-wrapper">
+      <div class="header">
+        <div class="text">#예뻐지는 시간</div>
+      </div>
+    </div>
+    <div class="scroll-slide">
       <div
         class="scrolling-wrapper-flexbox"
         :style="{ transform: `translateX(${x}px)` }"
@@ -13,7 +18,7 @@
         ></router-link>
       </div>
     </div>
-    <div class="scrollBar">
+    <div class="scroll-bar">
       <span
         v-for="index in 6"
         :key="index"
@@ -21,6 +26,24 @@
         :class="moving === index - 1 ? 'clicked' : 'not-clicked'"
         @click="setLocation(index - 1)"
       ></span>
+    </div>
+    <div class="contents-wrapper">
+      <div class="content" v-for="index in 6" :key="index">
+        <router-link to="" class="anchor"></router-link>
+      </div>
+    </div>
+    <div class="page-bar">
+      <button
+        class="pageButton"
+        :class="index === 1 ? 'clicked' : 'not-clicked'"
+        v-for="index in 5"
+        :key="index"
+      >
+        <span class="text">{{ index }}</span>
+      </button>
+      <button class="pageButton">
+        <span class="text" :style="{ fontWeight: 800 }">></span>
+      </button>
     </div>
   </div>
 </template>
@@ -35,7 +58,7 @@ export default Vue.extend({
     image: ['https://i.stack.imgur.com/nGzAB.png'],
     x: 50,
     screen: useScreen(),
-    power: 420,
+    power: 410,
     moving: 0,
   }),
   methods: {
@@ -45,18 +68,18 @@ export default Vue.extend({
     setLocation(moving: number) {
       this.moving = moving;
       if (screen.width > 500) {
-        this.$data.x = 50 - 420 * moving;
+        this.$data.x = 50 - 410 * moving;
       } else {
         this.$data.x =
           (screen.width - screen.width * 0.8) / 2 -
-          (screen.width * 0.8 + 20) * moving;
+          (screen.width * 0.8 + 10) * moving;
       }
     },
   },
   created() {
     if (screen.width < 500) {
       this.$data.x = (screen.width - screen.width * 0.8) / 2;
-      this.power = screen.width * 0.8 + 20;
+      this.power = screen.width * 0.8 + 10;
     }
     setInterval(() => {
       this.moving += 1;
@@ -64,7 +87,7 @@ export default Vue.extend({
         if (screen.width < 500) {
           this.x = (screen.width - screen.width * 0.8) / 2;
         } else {
-          this.x = 50;
+          this.x = 40;
         }
         this.moving = 0;
       } else {
@@ -76,11 +99,11 @@ export default Vue.extend({
     'screen.width': function (width: number) {
       if (width < 500) {
         this.$data.x = (screen.width - screen.width * 0.8) / 2;
-        this.power = screen.width * 0.8 + 20;
+        this.power = screen.width * 0.8 + 10;
         this.moving = 0;
       } else {
-        this.$data.x = 50;
-        this.power = 420;
+        this.$data.x = 40;
+        this.power = 410;
         this.moving = 0;
       }
     },
@@ -89,18 +112,43 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.wrapper {
+#container-main {
+  background-color: #f5f5f5;
+}
+
+.header-wrapper {
+  width: 100%;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 30px;
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ff3e9b;
+    .text {
+      font-size: 40px;
+      padding: 0 5px;
+      color: white;
+      font-weight: 700;
+    }
+  }
+}
+
+.scroll-slide {
   overflow-x: hidden;
   width: 100%;
   height: 200px;
-  margin: 20px 0;
+  margin: 30px 0;
   .scrolling-wrapper-flexbox {
     display: flex;
     flex-wrap: nowrap;
     width: 100%;
     height: 100%;
     flex-direction: row;
-    gap: 0 20px;
+    gap: 0 10px;
     transition: all 500ms ease;
     /* transform: translateX(-20px); */
     .card {
@@ -117,7 +165,7 @@ export default Vue.extend({
     }
   }
 }
-.scrollBar {
+.scroll-bar {
   width: 100%;
   height: 10px;
   display: flex;
@@ -136,6 +184,60 @@ export default Vue.extend({
   }
   .not-clicked {
     background-color: #aeaeae;
+  }
+}
+
+.contents-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 10px;
+  justify-content: space-between;
+  margin-top: 30px;
+  width: 500px;
+
+  .content {
+    width: calc(50% - 5px);
+    height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .anchor {
+      width: 99%;
+      height: 99%;
+      background-color: black;
+      border-radius: 20px;
+      border: 1px solid black;
+      &:hover {
+        border: 5px solid #ff3e9b;
+      }
+      transition: all 300ms ease;
+    }
+  }
+}
+
+.page-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  padding: 30px 0;
+  .pageButton {
+    padding: 10px;
+    background-color: transparent;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    .text {
+      font-size: 15px;
+      font-weight: 500;
+      color: #5a5a5a;
+    }
+  }
+  .clicked {
+    border-bottom: 2px solid #feca1f;
+  }
+  .not-clicked {
+    border-bottom: none;
   }
 }
 </style>
