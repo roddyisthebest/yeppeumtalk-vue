@@ -28,7 +28,12 @@
       ></span>
     </div>
     <div class="contents-wrapper">
-      <div class="content" v-for="index in 6" :key="index">
+      <div
+        class="content"
+        v-for="index in 6"
+        :key="index"
+        :style="{ height: screen.width > 500 ? `250px` : `47.5vw` }"
+      >
         <router-link to="" class="anchor"></router-link>
       </div>
     </div>
@@ -87,7 +92,7 @@ export default Vue.extend({
         if (screen.width < 500) {
           this.x = (screen.width - screen.width * 0.8) / 2;
         } else {
-          this.x = 40;
+          this.x = 50;
         }
         this.moving = 0;
       } else {
@@ -193,17 +198,16 @@ export default Vue.extend({
   gap: 10px 10px;
   justify-content: space-between;
   margin-top: 30px;
-  width: 500px;
-
+  width: 100%;
   .content {
-    width: calc(50% - 5px);
-    height: 250px;
+    $width: calc(50% - 5px);
+    width: $width;
     display: flex;
     align-items: center;
     justify-content: center;
     .anchor {
-      width: 99%;
-      height: 99%;
+      width: 95%;
+      height: 95%;
       background-color: black;
       border-radius: 20px;
       border: 1px solid black;

@@ -1,8 +1,34 @@
 <template>
   <div id="app">
-    <div id="container">
-      <nav>
-        <button id="button">
+    <div
+      class="container"
+      v-if="navigation"
+      :style="{ position: 'fixed', zIndex: 500 }"
+    >
+      <nav
+        :style="{ width: screen.width > 500 ? '470px' : 'calc(100vw - 30px)' }"
+      >
+        <span></span>
+        <button id="button" @click="setNavigation">
+          <font-awesome-icon icon="fa-solid fa-xmark" />
+        </button>
+      </nav>
+      <div class="navigation-container">
+        <router-link to="/" class="item">
+          <span class="text">인기 이벤트</span>
+          <font-awesome-icon icon="fa-solid fa-angle-right" class="icon" />
+        </router-link>
+        <router-link to="/" class="item">
+          <span class="text">입점/제휴문의</span>
+          <font-awesome-icon icon="fa-solid fa-angle-right" class="icon" />
+        </router-link>
+      </div>
+    </div>
+    <div class="container">
+      <nav
+        :style="{ width: screen.width > 500 ? '470px' : 'calc(100vw - 30px)' }"
+      >
+        <button id="button" @click="setNavigation">
           <font-awesome-icon icon="fa-solid fa-bars" />
         </button>
       </nav>
@@ -32,8 +58,26 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { useScreen } from 'vue-screen';
 
-export default Vue.extend({});
+export default Vue.extend({
+  data() {
+    return {
+      screen: useScreen(),
+      navigation: false,
+    };
+  },
+  methods: {
+    setNavigation() {
+      this.$data.navigation = !this.$data.navigation;
+      if (!this.$data.navigation) {
+        document.body.style.overflow = 'auto';
+      } else {
+        document.body.style.overflow = 'hidden';
+      }
+    },
+  },
+});
 </script>
 <style lang="scss">
 body {
@@ -50,9 +94,35 @@ body {
   justify-content: center;
 }
 
-#container {
+.container {
   max-width: 500px;
   width: 100%;
+
+  .navigation-container {
+    width: 100%;
+    height: 100vh;
+    background-color: #f5f5f5;
+    padding-top: 80px;
+
+    .item {
+      padding: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #d8d8d8;
+      background-color: white;
+      text-decoration: none;
+      .text {
+        font-size: 25px;
+        color: black;
+        font-weight: 400;
+      }
+      .icon {
+        font-size: 25px;
+        color: #646464;
+      }
+    }
+  }
 }
 nav {
   position: fixed;
