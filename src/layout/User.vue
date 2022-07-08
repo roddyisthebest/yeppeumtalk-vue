@@ -1,33 +1,47 @@
 <template>
   <div>
     <div
-      class="container"
       v-if="navigation"
-      :style="{ position: 'fixed', zIndex: 500 }"
+      :style="{
+        position: 'fixed',
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        zIndex: 1000,
+      }"
     >
-      <nav
-        :style="{
-          width: screen.width > 500 ? '470px' : 'calc(100vw - 30px)',
-        }"
-      >
-        <span></span>
-        <button id="button" @click="setNavigation">
-          <font-awesome-icon icon="fa-solid fa-xmark" />
-        </button>
-      </nav>
-      <div class="navigation-container">
-        <router-link to="/" class="item">
-          <span class="text">인기 이벤트</span>
-          <font-awesome-icon icon="fa-solid fa-angle-right" class="icon" />
-        </router-link>
-        <router-link to="/" class="item">
-          <span class="text">입점/제휴문의</span>
-          <font-awesome-icon icon="fa-solid fa-angle-right" class="icon" />
-        </router-link>
+      <div class="container">
+        <nav
+          :style="{
+            backgroundColor: '#FECA1F',
+            backgroundImage: 'url()',
+            width: 'calc(100% - 30px)',
+          }"
+        >
+          <img
+            :src="require('@/assets/img/logo_transparent.png')"
+            :style="{ width: '150px' }"
+          />
+          <button id="button" @click="setNavigation">
+            <font-awesome-icon icon="fa-solid fa-xmark" />
+          </button>
+        </nav>
+        <div class="navigation-container">
+          <router-link to="/" class="item">
+            <span class="text">인기 이벤트</span>
+            <font-awesome-icon icon="fa-solid fa-angle-right" class="icon" />
+          </router-link>
+          <router-link to="/" class="item">
+            <span class="text">입점/제휴문의</span>
+            <font-awesome-icon icon="fa-solid fa-angle-right" class="icon" />
+          </router-link>
+        </div>
       </div>
     </div>
+
     <div class="container" id="top">
-      <nav :style="{ width: $data.width }">
+      <nav>
         <button id="button" @click="setNavigation">
           <font-awesome-icon icon="fa-solid fa-bars" />
         </button>
@@ -102,13 +116,6 @@ export default Vue.extend({
         }
       }
     },
-    'screen.width': function (width: number) {
-      if (width > 499) {
-        this.width = 'calc(100% - 30px)';
-      } else {
-        this.width = 'calc(100% - 30px)';
-      }
-    },
   },
 });
 </script>
@@ -156,6 +163,7 @@ nav {
   background-image: url('@/assets/img/background.png');
   max-width: calc(500px - 30px);
   height: 80px;
+  width: 100%;
   display: flex;
   padding: 0 15px;
   align-items: center;
