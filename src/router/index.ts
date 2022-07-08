@@ -42,6 +42,12 @@ const routes: Array<RouteConfig> = [
     meta: { layout: 'Admin' },
     component: () => import('../views/Link.vue'),
   },
+  {
+    path: '/login',
+    name: 'login',
+    meta: { layout: 'Auth' },
+    component: () => import('../views/Login.vue'),
+  },
 ];
 
 const router = new VueRouter({

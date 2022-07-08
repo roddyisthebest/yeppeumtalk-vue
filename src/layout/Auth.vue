@@ -1,6 +1,5 @@
 <template>
-  <div>
-    <span>admin</span>
+  <div :style="{ width: '100%' }">
     <slot />
   </div>
 </template>

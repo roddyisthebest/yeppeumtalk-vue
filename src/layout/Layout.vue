@@ -8,16 +8,17 @@
 import Vue from 'vue';
 import Admin from '@/layout/Admin.vue';
 import User from '@/layout/User.vue';
+import Auth from '@/layout/Auth.vue';
 export default Vue.extend({
   name: 'LayoutView',
-  components: { Admin, User },
+  components: { Admin, User, Auth },
   data() {
     return {
       layout: 'Admin' as string,
     };
   },
   watch: {
-    $route(to, from) {
+    $route(to) {
       this.$data.layout = to.meta?.layout;
     },
   },

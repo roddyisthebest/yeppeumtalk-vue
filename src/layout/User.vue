@@ -32,7 +32,7 @@
           <font-awesome-icon icon="fa-solid fa-bars" />
         </button>
       </nav>
-      <div :style="{ paddingTop: '80px' }">
+      <div :style="{ paddingTop: '80px', background: '#f5f5f5' }">
         <slot />
       </div>
       <footer :style="{ paddingBottom: bottomPadding ? '230px' : '0px' }">
@@ -91,7 +91,7 @@ export default Vue.extend({
     console.log(this);
   },
   watch: {
-    $route(to, from) {
+    $route(to) {
       if (to.name === 'home' || to.name === 'privacy') {
         if (this.bottomPadding) {
           this.bottomPadding = false;
