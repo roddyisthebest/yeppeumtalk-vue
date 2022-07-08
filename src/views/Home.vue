@@ -2,7 +2,9 @@
   <div id="container-main">
     <div class="header-wrapper">
       <div class="header">
-        <div class="text">#예뻐지는 시간</div>
+        <div class="text" :style="{ fontSize: $data.textSize }">
+          #예뻐지는 시간
+        </div>
       </div>
     </div>
     <Slide />
@@ -11,13 +13,11 @@
         class="content"
         v-for="index in 6"
         :key="index"
-        :style="{ height: screen.width > 500 ? `238px` : `47.5vw` }"
+        :style="{ height, width: $data.contentHeight }"
       >
         <router-link :to="`/detail/${index}`" class="anchor">
-          <img :src="require('@/assets/square.jpg')" class="img" alt=""
-        >
-        <span class="border"></span>
-        </img></router-link>
+          <img :src="require('@/assets/img/square.jpg')" class="img" alt="" />
+        </router-link>
       </div>
     </div>
     <div class="page-bar">
@@ -44,6 +44,9 @@ export default Vue.extend({
   name: 'HomeView',
   data: () => ({
     screen: useScreen(),
+    height: '238px',
+    contentHeight: 'calc(50% - 5px)',
+    textSize: '40px',
   }),
   methods: {
     scrollToTop() {
@@ -52,6 +55,30 @@ export default Vue.extend({
   },
   components: {
     Slide,
+  },
+  created() {
+    if (this.screen.width < 499) {
+      this.height = '100%';
+      this.contentHeight = '100%';
+      this.textSize = '10vw';
+    } else {
+      this.height = '238px';
+      this.contentHeight = 'calc(50% - 5px)';
+      this.textSize = '40px';
+    }
+  },
+  watch: {
+    'screen.width': function (width: number) {
+      if (width < 499) {
+        this.height = '100%';
+        this.contentHeight = '100%';
+        this.textSize = '10vw';
+      } else {
+        this.height = '238px';
+        this.contentHeight = 'calc(50% - 5px)';
+        this.textSize = '40px';
+      }
+    },
   },
 });
 </script>
@@ -135,14 +162,14 @@ export default Vue.extend({
 .contents-wrapper {
   display: flex;
   flex-wrap: wrap;
-    justify-content: space-evenly;
+  justify-content: space-evenly;
 
   margin-top: 30px;
   width: 100%;
-  
+
   .content {
-    $width: calc(50% - 5px);
-    width: $width;
+    /* $width: calc(50% - 5px); */
+    /* width: $width; */
     display: flex;
     /* &:nth-child(even) {
       align-items: center;
@@ -159,10 +186,10 @@ export default Vue.extend({
       height: 93%;
       border-radius: 30px;
       /* border: 10px solid transparent; */
-      &:hover{
-        border:10px solid #FF3E9B;
+      &:hover {
+        border: 10px solid #ff3e9b;
       }
-      border:10px solid transparent;
+      border: 10px solid transparent;
 
       .img {
         width: 100%;
@@ -187,8 +214,10 @@ export default Vue.extend({
   justify-content: center;
   gap: 15px;
   padding: 30px 0;
+  width: 100%;
+  flex-wrap: wrap;
   .pageButton {
-    padding: 10px;
+    /* padding: 10px; */
     background-color: transparent;
     border: none;
     outline: none;

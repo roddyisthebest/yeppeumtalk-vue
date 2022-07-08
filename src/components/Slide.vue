@@ -1,9 +1,6 @@
 <template>
   <div>
-    <div
-      class="scroll-slide"
-      :style="{ height: screen.width > 500 ? '200px' : '40vw' }"
-    >
+    <div class="scroll-slide" :style="{ height }">
       <div
         class="scrolling-wrapper-flexbox"
         :style="{ transform: `translateX(${x}px)` }"
@@ -14,7 +11,11 @@
           v-for="index in 6"
           :key="index"
         >
-          <img :src="require('@/assets/horizontal.jpg')" class="img" alt="" />
+          <img
+            :src="require('@/assets/img/horizontal.jpg')"
+            class="img"
+            alt=""
+          />
         </router-link>
       </div>
     </div>
@@ -42,6 +43,7 @@ export default Vue.extend({
       screen: useScreen(),
       power: 410,
       moving: 0,
+      height: '200px',
     };
   },
   methods: {
@@ -63,6 +65,9 @@ export default Vue.extend({
     if (screen.width < 500) {
       this.$data.x = (screen.width - screen.width * 0.8) / 2;
       this.power = screen.width * 0.8 + 10;
+      this.height = '100%';
+    } else {
+      this.height = '200px';
     }
     setInterval(() => {
       this.moving += 1;
@@ -84,10 +89,12 @@ export default Vue.extend({
         this.$data.x = (screen.width - screen.width * 0.8) / 2;
         this.power = screen.width * 0.8 + 10;
         this.moving = 0;
+        this.height = '100%';
       } else {
         this.$data.x = 40;
         this.power = 410;
         this.moving = 0;
+        this.height = '200px';
       }
     },
   },
@@ -110,7 +117,6 @@ export default Vue.extend({
     /* transform: translateX(-20px); */
     .card {
       flex: 0 0 auto;
-      background-color: gray;
       width: 80%;
       height: 100%;
       border-radius: 20px;

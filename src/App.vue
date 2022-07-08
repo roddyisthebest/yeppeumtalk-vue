@@ -1,115 +1,29 @@
 <template>
   <div id="app">
-    <div
-      class="container"
-      v-if="navigation"
-      :style="{ position: 'fixed', zIndex: 500 }"
-    >
-      <nav
-        :style="{ width: screen.width > 500 ? '470px' : 'calc(100vw - 30px)' }"
-      >
-        <span></span>
-        <button id="button" @click="setNavigation">
-          <font-awesome-icon icon="fa-solid fa-xmark" />
-        </button>
-      </nav>
-      <div class="navigation-container">
-        <router-link to="/" class="item">
-          <span class="text">인기 이벤트</span>
-          <font-awesome-icon icon="fa-solid fa-angle-right" class="icon" />
-        </router-link>
-        <router-link to="/" class="item">
-          <span class="text">입점/제휴문의</span>
-          <font-awesome-icon icon="fa-solid fa-angle-right" class="icon" />
-        </router-link>
-      </div>
-    </div>
-    <div class="container" id="top">
-      <nav
-        :style="{ width: screen.width > 500 ? '470px' : 'calc(100vw - 30px)' }"
-      >
-        <button id="button" @click="setNavigation">
-          <font-awesome-icon icon="fa-solid fa-bars" />
-        </button>
-      </nav>
-      <router-view :style="{ paddingTop: '80px' }" />
-      <footer :style="{ paddingBottom: bottomPadding ? '230px' : '0px' }">
-        <div id="nav-bar">
-          <router-link to="/" class="button">
-            <span class="text">개인정보처리방침</span>
-          </router-link>
-          <span class="block"></span>
-          <router-link to="/" class="button">
-            <span class="text">입점/제휴문의</span>
-          </router-link>
-        </div>
-        <div id="info-wrapper">
-          <span class="text"
-            >주소 : 서울시 강남구 강남대로 | 사업자 등록번호: 220-88-86589</span
-          >
-          <span class="text"
-            >COPYRIGHT ⓒ 2020 YEPPEMTALK. ALL RIGHT RESERVED</span
-          >
-        </div>
-      </footer>
-      <button @click="goUp" class="goUpButton">
-        <font-awesome-icon icon="fa-solid fa-up-long" />
-      </button>
-    </div>
+    <Layout>
+      <router-view></router-view>
+    </Layout>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { useScreen } from 'vue-screen';
-
+import Layout from '@/layout/Layout.vue';
 export default Vue.extend({
-  data() {
-    return {
-      screen: useScreen(),
-      navigation: false,
-      bottomPadding: false,
-    };
-  },
-  methods: {
-    setNavigation() {
-      this.$data.navigation = !this.$data.navigation;
-      if (!this.$data.navigation) {
-        document.body.style.overflow = 'auto';
-      } else {
-        document.body.style.overflow = 'hidden';
-      }
-    },
-    goUp() {
-      scrollTo({ top: 0, behavior: 'smooth' });
-    },
-  },
-  created() {
-    console.log(this);
-  },
-  watch: {
-    $route(to, from) {
-      if (to.name === 'home') {
-        if (this.bottomPadding) {
-          this.bottomPadding = false;
-        }
-      } else {
-        if (!this.bottomPadding) {
-          this.bottomPadding = true;
-        }
-      }
-    },
+  components: {
+    Layout,
   },
 });
 </script>
 <style lang="scss">
 body {
   margin: 0;
-  min-width: 300px;
+
+  min-height: 500px;
 }
 
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'SCDream', sans-serif !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
@@ -118,116 +32,52 @@ body {
   justify-content: center;
 }
 
-.container {
-  max-width: 500px;
-  width: 100%;
-  position: relative;
-  .navigation-container {
-    width: 100%;
-    height: 100vh;
-    background-color: #f5f5f5;
-    padding-top: 80px;
-
-    .item {
-      padding: 30px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #d8d8d8;
-      background-color: white;
-      text-decoration: none;
-      .text {
-        font-size: 25px;
-        color: black;
-        font-weight: 500;
-      }
-      .icon {
-        font-size: 25px;
-        color: #646464;
-      }
-    }
-  }
+@font-face {
+  font-family: 'SCDream';
+  src: url('assets/font/SCDream1.otf') format('truetype');
+  font-weight: 100;
 }
-nav {
-  position: fixed;
-  z-index: 100;
-  background-color: #feca1f;
-  width: 640px;
-  height: 80px;
-  display: flex;
-  padding: 0 15px;
-  align-items: center;
-  justify-content: space-between;
-  #button {
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: none;
-    background-color: transparent;
-    color: white;
-    font-size: 30px;
-    cursor: pointer;
-  }
+@font-face {
+  font-family: 'SCDream';
+  src: url('assets/font/SCDream2.otf') format('truetype');
+  font-weight: 200;
 }
-.goUpButton {
-  position: fixed;
-  left: 30px;
-  bottom: 20px;
-  border: none;
-  background-color: #aeaeae;
-  width: 30px;
-  height: 30px;
-  border-radius: 20px;
-  opacity: 0.6;
-  color: white;
-  font-size: 15px;
-  cursor: pointer;
-
-  /* top: 20px; */
+@font-face {
+  font-family: 'SCDream';
+  src: url('assets/font/SCDream3.otf') format('truetype');
+  font-weight: 300;
 }
-footer {
-  #nav-bar {
-    height: 50px;
-    display: flex;
-    .button {
-      background-color: #5a5a5a;
-      border: none;
-      flex: 1;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-decoration: none;
+@font-face {
+  font-family: 'SCDream';
+  src: url('assets/font/SCDream4.otf') format('truetype');
+  font-weight: 400;
+}
+@font-face {
+  font-family: 'SCDream';
+  src: url('assets/font/SCDream5.otf') format('truetype');
+  font-weight: 500;
+}
 
-      .text {
-        color: #f5f5f5;
-        font-size: 15px;
-        font-weight: 400;
-      }
-    }
-    .block {
-      width: 1.5px;
-      height: 100%;
-      background-color: #f5f5f5;
-    }
-  }
-  #info-wrapper {
-    background-color: #ededed;
+@font-face {
+  font-family: 'SCDream';
+  src: url('assets/font/SCDream6.otf') format('truetype');
+  font-weight: 600;
+}
 
-    height: 110px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 2.5px 0;
-    flex-direction: column;
-    .text {
-      color: #5a5a5a;
-      font-size: 13px;
-      font-weight: 500;
-    }
-  }
+@font-face {
+  font-family: 'SCDream';
+  src: url('assets/font/SCDream7.otf') format('truetype');
+  font-weight: 700;
+}
+@font-face {
+  font-family: 'SCDream';
+  src: url('assets/font/SCDream8.otf') format('truetype');
+  font-weight: 800;
+}
+@font-face {
+  font-family: 'SCDream';
+  src: url('assets/font/SCDream9.otf') format('truetype');
+  font-weight: 900;
 }
 
 /* nav a.router-link-exact-active {

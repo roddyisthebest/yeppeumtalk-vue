@@ -1,9 +1,11 @@
 <template>
   <div id="container-detail">
-    <img :src="require('@/assets/vertical.jpg')" id="img-view" alt="" />
+    <img :src="require('@/assets/img/vertical.jpg')" id="img-view" alt="" />
     <div class="header-wrapper">
       <div class="header">
-        <div class="text">#예뻐지는 시간</div>
+        <div class="text" :style="{ fontSize: $data.textSize }">
+          #예뻐지는 시간
+        </div>
       </div>
     </div>
     <Slide :style="{ paddingBottom: '30px' }"></Slide>
@@ -13,7 +15,7 @@
       <div id="checkColumn">
         <input type="checkbox" name="color" />
         <span id="text">개인정보처리방침</span>
-        <div id="check-button">상세보기</div>
+        <router-link to="/privacy" id="check-button">상세보기</router-link>
       </div>
       <button id="button">이벤트 신청하기</button>
     </div>
@@ -23,6 +25,8 @@
 <script lang="ts">
 import Vue from 'vue';
 import Slide from '../components/Slide.vue';
+import { useScreen } from 'vue-screen';
+
 export default Vue.extend({
   name: 'DetailView',
   components: { Slide },
@@ -33,6 +37,18 @@ export default Vue.extend({
   },
   created() {
     this.scrollToTop();
+  },
+  data() {
+    return { textSize: '40px', screen: useScreen() };
+  },
+  watch: {
+    'screen.width': function (width: number) {
+      if (width < 499) {
+        this.textSize = '10vw';
+      } else {
+        this.textSize = '40px';
+      }
+    },
   },
 });
 </script>
@@ -59,7 +75,6 @@ export default Vue.extend({
       justify-content: center;
       background-color: #ff3e9b;
       .text {
-        font-size: 40px;
         padding: 0 5px;
         color: white;
         font-weight: 700;
@@ -111,6 +126,7 @@ export default Vue.extend({
         color: white;
         font-weight: 600;
         cursor: pointer;
+        text-decoration: none;
       }
     }
 
