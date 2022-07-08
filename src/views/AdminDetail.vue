@@ -1,5 +1,5 @@
 <template>
-  <div>hello detail!</div>
+  <div id="container">hello detail!</div>
 </template>
 
 <script lang="ts">
@@ -10,4 +10,10 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped></style>
+<style scoped lang="scss">
+#container {
+  flex: 1;
+  display: flex;
+  background-color: white;
+}
+</style>

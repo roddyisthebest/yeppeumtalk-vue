@@ -21,7 +21,9 @@ body {
 
   min-height: 500px;
 }
-
+a {
+  text-decoration: none;
+}
 #app {
   font-family: 'SCDream', sans-serif !important;
   -webkit-font-smoothing: antialiased;
