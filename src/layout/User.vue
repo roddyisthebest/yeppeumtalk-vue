@@ -104,7 +104,7 @@ export default Vue.extend({
     },
     'screen.width': function (width: number) {
       if (width > 499) {
-        this.width = '470px';
+        this.width = 'calc(100% - 30px)';
       } else {
         this.width = 'calc(100% - 30px)';
       }
@@ -115,6 +115,7 @@ export default Vue.extend({
 
 <style scoped lang="scss">
 .container {
+  margin: 0 auto;
   max-width: 500px;
   width: 100%;
   position: relative;
@@ -147,12 +148,13 @@ export default Vue.extend({
 nav {
   position: fixed;
   z-index: 100;
+  top: 0;
   /* background-color: #feca1f; */
   background-position: center center;
   background-repeat: no-repeat;
   background-size: cover;
   background-image: url('@/assets/img/background.png');
-  width: 640px;
+  max-width: calc(500px - 30px);
   height: 80px;
   display: flex;
   padding: 0 15px;

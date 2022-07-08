@@ -3,7 +3,7 @@
     <span id="header">관리자 페이지</span>
     <input type="text" class="loginInput" />
     <input type="text" class="loginInput" />
-    <div id="button">로그인</div>
+    <button id="button" @click="go">로그인</button>
   </div>
 </template>
 
@@ -12,6 +12,11 @@ import Vue from 'vue';
 
 export default Vue.extend({
   name: 'LoginView',
+  methods: {
+    go() {
+      this.$router.push('/admin');
+    },
+  },
 });
 </script>
 
@@ -41,17 +46,16 @@ export default Vue.extend({
     font-size: 20px;
   }
   #button {
-    width: 250px;
+    width: 282px;
     height: 50px;
     padding: 0 15px;
     font-size: 20px;
     color: white;
     font-weight: 500;
     background-color: black;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    margin: 0;
     cursor: pointer;
+    border: none;
   }
 }
 </style>

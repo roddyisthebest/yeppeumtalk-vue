@@ -10,12 +10,20 @@ import {
   faXmark,
   faAngleRight,
   faUpLong,
+  faCaretRight,
 } from '@fortawesome/free-solid-svg-icons';
 
 /* import font awesome icon component */
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 /* add icons to the library */
-library.add(faUserSecret, faBars, faXmark, faAngleRight, faUpLong);
+library.add(
+  faUserSecret,
+  faBars,
+  faXmark,
+  faAngleRight,
+  faUpLong,
+  faCaretRight
+);
 
 /* add font awesome icon component */
 Vue.component('font-awesome-icon', FontAwesomeIcon);
