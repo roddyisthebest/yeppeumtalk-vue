@@ -3,8 +3,8 @@
     <span id="header">관리자 페이지</span>
     <input type="text" class="loginInput" />
     <input type="text" class="loginInput" />
-    <button class="button normal" @click="go('admin')">로그인</button>
-    <button class="button unNormal" @click="go('signup')">가입하기</button>
+    <button class="button normal">가입하기</button>
+    <button class="button unNormal" @click="go('login')">돌아가기</button>
   </div>
 </template>
 
