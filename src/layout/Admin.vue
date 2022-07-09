@@ -10,13 +10,19 @@
             icon="fa-solid fa-caret-right"
             :style="{
               fontSize: '20px',
-              color: getRoute === 'admin' ? 'black' : '#D9D9D9',
+              color:
+                getRoute === 'admin' || getRoute === 'detail'
+                  ? 'black'
+                  : '#D9D9D9',
             }"
           />
           <span
             class="text"
             :style="{
-              color: getRoute === 'admin' ? 'black' : '#D9D9D9',
+              color:
+                getRoute === 'admin' || getRoute === 'detail'
+                  ? 'black'
+                  : '#D9D9D9',
             }"
             >이벤트</span
           >
