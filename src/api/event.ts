@@ -1,6 +1,6 @@
 import { AxiosResponse } from 'axios';
 import { api } from '.';
-
+import { response } from '@/types';
 const saveEvent = (formData: FormData): Promise<AxiosResponse<unknown>> => {
   return api.post('/events', { formData });
 };
@@ -20,7 +20,7 @@ const getEvents = (
   size: number,
   page: number,
   query: string
-): Promise<AxiosResponse<unknown>> => {
+): Promise<AxiosResponse<response>> => {
   return api.get(`/events?size=${size}&page=${page}&query=${query}`);
 };
 

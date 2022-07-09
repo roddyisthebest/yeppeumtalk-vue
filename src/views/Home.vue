@@ -11,25 +11,37 @@
     <div class="contents-wrapper">
       <div
         class="content"
-        v-for="index in 6"
-        :key="index"
+        v-for="event in events"
+        :key="event.idx"
         :style="{ height, width: $data.contentHeight }"
       >
-        <router-link :to="`/detail/${index}`" class="anchor">
-          <img :src="require('@/assets/img/square.jpg')" class="img" alt="" />
+        <router-link :to="`/detail/${event.idx}`" class="anchor">
+          <img :src="event.squareImageUri" class="img" alt="" />
         </router-link>
       </div>
     </div>
     <div class="page-bar">
       <button
         class="pageButton"
-        :class="index === 1 ? 'clicked' : 'not-clicked'"
-        v-for="index in 5"
+        v-if="Math.max(...pages) > 5"
+        @click="movePage(false)"
+      >
+        <span class="text" :style="{ fontWeight: 800 }"><</span>
+      </button>
+      <button
+        class="pageButton"
+        :class="currentPage === index ? 'clicked' : 'not-clicked'"
+        v-for="index in pages"
         :key="index"
+        @click="setPage(index)"
       >
         <span class="text">{{ index }}</span>
       </button>
-      <button class="pageButton">
+      <button
+        class="pageButton"
+        v-if="!pages.includes(totalPage)"
+        @click="movePage(true)"
+      >
         <span class="text" :style="{ fontWeight: 800 }">></span>
       </button>
     </div>
@@ -40,6 +52,8 @@
 import Vue from 'vue';
 import { useScreen } from 'vue-screen';
 import Slide from '../components/Slide.vue';
+import { getEvents } from '@/api/event';
+import { event } from '@/types/index';
 export default Vue.extend({
   name: 'HomeView',
   data: () => ({
@@ -47,16 +61,49 @@ export default Vue.extend({
     height: '238px',
     contentHeight: 'calc(50% - 5px)',
     textSize: '40px',
+    totalPage: null as null | number,
+    currentPage: 1,
+    events: [] as event[],
+    pages: [] as number[],
   }),
   methods: {
     scrollToTop() {
       window.scrollTo(0, 0);
     },
+    movePage(plus: boolean) {
+      const future = this.pages[this.pages.length - 1] + 5;
+      const now = this.pages[this.pages.length - 1];
+
+      if (plus) {
+        this.currentPage = now;
+        if ((this.totalPage as number) > future) {
+          this.pages = [];
+          for (let i = now; i < future; i++) {
+            this.pages.push(i);
+          }
+        } else {
+          this.pages = [];
+          for (let i = now; i < (this.totalPage as number) + 1; i++) {
+            this.pages.push(i);
+          }
+        }
+      } else {
+        const first = this.pages[0];
+        this.currentPage = first - 4;
+        this.pages = [];
+        for (let i = first - 5; i < first; i++) {
+          this.pages.push(i + 1);
+        }
+      }
+    },
+    setPage(page: number) {
+      this.currentPage = page;
+    },
   },
   components: {
     Slide,
   },
-  created() {
+  async created() {
     if (this.screen.width < 499) {
       this.height = '100%';
       this.contentHeight = '100%';
@@ -65,6 +112,19 @@ export default Vue.extend({
       this.height = '238px';
       this.contentHeight = 'calc(50% - 5px)';
       this.textSize = '40px';
+    }
+    const {
+      data: { data },
+    } = await getEvents(6, this.currentPage - 1, '');
+    this.events = data.contents;
+    this.totalPage = data.total_page;
+
+    if (this.totalPage > 5) {
+      this.pages = [1, 2, 3, 4, 5];
+    } else {
+      for (let i = 0; i < this.totalPage; i++) {
+        this.pages.push(i + 1);
+      }
     }
   },
   watch: {
@@ -222,17 +282,19 @@ export default Vue.extend({
     border: none;
     outline: none;
     cursor: pointer;
+    padding-bottom: 5px;
     .text {
       font-size: 15px;
       font-weight: 500;
       color: #5a5a5a;
     }
+    border-bottom: 2px solid transparent;
   }
   .clicked {
-    border-bottom: 2px solid #feca1f;
+    border-color: #feca1f;
   }
   .not-clicked {
-    border-bottom: none;
+    border-color: transparent;
   }
 }
 </style>
