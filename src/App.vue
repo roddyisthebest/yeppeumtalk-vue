@@ -24,6 +24,10 @@ body {
 a {
   text-decoration: none;
 }
+button {
+  border: none;
+  cursor: pointer;
+}
 #app {
   font-family: 'SCDream', sans-serif !important;
   -webkit-font-smoothing: antialiased;

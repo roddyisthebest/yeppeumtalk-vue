@@ -12,7 +12,7 @@
           <span class="text two">생성날짜</span>
         </div>
         <router-link
-          to="/admin/detail/12"
+          :to="`/admin/detail/${index}`"
           class="item"
           v-for="index in 7"
           :key="index"
@@ -150,6 +150,8 @@ export default Vue.extend({
     flex: 1;
     height: 85%;
     border: 1px solid #d9d9d9;
+    overflow-y: scroll;
+    background-color: white;
   }
   #block {
     width: 1px;

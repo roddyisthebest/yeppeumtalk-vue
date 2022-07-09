@@ -12,6 +12,7 @@ import {
   faUpLong,
   faCaretRight,
   faSearch,
+  faImage,
 } from '@fortawesome/free-solid-svg-icons';
 
 /* import font awesome icon component */
@@ -24,7 +25,8 @@ library.add(
   faAngleRight,
   faUpLong,
   faCaretRight,
-  faSearch
+  faSearch,
+  faImage
 );
 
 /* add font awesome icon component */
