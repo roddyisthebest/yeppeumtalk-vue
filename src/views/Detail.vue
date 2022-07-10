@@ -1,24 +1,48 @@
 <template>
   <div id="container-detail">
-    <img :src="require('@/assets/img/vertical.jpg')" id="img-view" alt="" />
-    <div class="header-wrapper">
-      <div class="header">
-        <div class="text" :style="{ fontSize: $data.textSize }">
-          #예뻐지는 시간
+    <template v-if="!loading">
+      <VLazyImage
+        :src="data.contentImageUri"
+        :src-placeholder="require('@/assets/img/loading.gif')"
+        id="img-view"
+        alt=""
+      />
+      <div class="header-wrapper">
+        <div class="header">
+          <div class="text" :style="{ fontSize: $data.textSize }">
+            #예뻐지는 시간
+          </div>
         </div>
       </div>
-    </div>
-    <Slide :style="{ paddingBottom: '30px' }"></Slide>
-    <div id="inputWrapper">
-      <input type="text" class="input" />
-      <input type="text" class="input" />
-      <div id="checkColumn">
-        <input type="checkbox" name="color" />
-        <span id="text">개인정보처리방침</span>
-        <router-link to="/privacy" id="check-button">상세보기</router-link>
+      <Slide :style="{ paddingBottom: '30px' }" :slides="slides"></Slide>
+      <div id="inputWrapper">
+        <input type="text" v-model="name" class="input" placeholder="이름" />
+        <input
+          type="number"
+          v-model="phone"
+          class="input"
+          placeholder="연락처"
+        />
+        <div id="checkColumn">
+          <input type="checkbox" name="color" v-model="clauseAgree" />
+          <span id="text">개인정보 처리방침 동의</span>
+          <router-link to="/privacy" id="check-button">상세보기</router-link>
+        </div>
+        <button id="button" @click="submit" :disabled="buttonLoading">
+          이벤트 신청하기
+        </button>
       </div>
-      <button id="button">이벤트 신청하기</button>
-    </div>
+    </template>
+    <template v-else>
+      <div id="loading-wrapper">
+        <Loading
+          :can-cancel="true"
+          :is-full-page="false"
+          :style="{ display: 'flex' }"
+          :opacity="0"
+        />
+      </div>
+    </template>
   </div>
 </template>
 
@@ -26,20 +50,80 @@
 import Vue from 'vue';
 import Slide from '../components/Slide.vue';
 import { useScreen } from 'vue-screen';
+import VLazyImage from 'v-lazy-image';
+import { getEventByIdx, getEvents } from '@/api/event';
+import { event } from '@/types/index';
+import Loading from 'vue-loading-overlay';
+import 'vue-loading-overlay/dist/vue-loading.css';
+import { saveApply } from '@/api/event';
 
 export default Vue.extend({
   name: 'DetailView',
-  components: { Slide },
+  components: { Slide, VLazyImage, Loading },
   methods: {
     scrollToTop() {
       window.scrollTo(0, 0);
     },
+    async submit() {
+      var regPhone = /^01([0|1|6|7|8|9])-?([0-9]{4})-?([0-9]{4})$/;
+      try {
+        this.buttonLoading = true;
+        if (!this.clauseAgree) {
+          alert(`개인정보 처리방침에 대해 동의하지 않았습니다.`);
+          return;
+        }
+        if (this.name.length >= 2 && regPhone.test(this.phone)) {
+          await saveApply(
+            this.$route.params.idx,
+            this.name,
+            this.phone,
+            this.clauseAgree
+          );
+          alert(
+            `${this.name}님! 연락처 ${this.phone} 으로 신청 완료되었습니다.`
+          );
+        } else {
+          alert(`잘못된 입력입니다.`);
+        }
+      } catch (e) {
+        alert('서버오류입니다. 관리자에게 연락주세요.');
+      } finally {
+        this.phone = '';
+        this.name = '';
+        this.clauseAgree = false;
+        this.buttonLoading = false;
+      }
+    },
   },
-  created() {
+  async created() {
     this.scrollToTop();
+    try {
+      const {
+        data: { data: detail },
+      } = await getEventByIdx(this.$route.params.idx);
+      const {
+        data: { data: slides },
+      } = await getEvents(6, 0, '');
+      this.data = detail;
+      this.slides = slides.contents;
+    } catch (e) {
+      alert('서버오류입니다. 관리자에게 연락하세요.');
+    } finally {
+      this.loading = false;
+    }
   },
   data() {
-    return { textSize: '40px', screen: useScreen() };
+    return {
+      textSize: '40px',
+      screen: useScreen(),
+      data: null as event | object | null,
+      loading: true,
+      slides: [] as event[],
+      name: '',
+      phone: '',
+      clauseAgree: false,
+      buttonLoading: false,
+    };
   },
   watch: {
     'screen.width': function (width: number) {
@@ -47,6 +131,24 @@ export default Vue.extend({
         this.textSize = '10vw';
       } else {
         this.textSize = '40px';
+      }
+    },
+    '$route.params.idx': async function () {
+      this.scrollToTop();
+      this.phone = '';
+      this.name = '';
+      this.clauseAgree = false;
+
+      try {
+        this.loading = true;
+        const {
+          data: { data: detail },
+        } = await getEventByIdx(this.$route.params.idx);
+        this.data = detail;
+      } catch {
+        alert('서버오류입니다. 관리자에게 연락하세요.');
+      } finally {
+        this.loading = false;
       }
     },
   },
@@ -140,6 +242,12 @@ export default Vue.extend({
       font-weight: 600;
       border: 1px solid #f0097b;
     }
+  }
+  #loading-wrapper {
+    height: 411px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 </style>

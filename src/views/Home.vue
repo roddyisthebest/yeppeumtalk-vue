@@ -7,44 +7,62 @@
         </div>
       </div>
     </div>
-    <Slide />
-    <div class="contents-wrapper">
-      <div
-        class="content"
-        v-for="event in events"
-        :key="event.idx"
-        :style="{ height, width: $data.contentHeight }"
-      >
-        <router-link :to="`/detail/${event.idx}`" class="anchor">
-          <img :src="event.squareImageUri" class="img" alt="" />
-        </router-link>
+    <template v-if="loading">
+      <Slide :slides="slides" />
+
+      <div class="contents-wrapper">
+        <div
+          class="content"
+          v-for="event in events"
+          :key="event.idx"
+          :style="{ height, width: $data.contentHeight }"
+        >
+          <router-link :to="`/detail/${event.idx}`" class="anchor">
+            <VLazyImage
+              :src="event.squareImageUri"
+              :src-placeholder="require('@/assets/img/loading.gif')"
+              class="img"
+              alt=""
+            />
+          </router-link>
+        </div>
       </div>
-    </div>
-    <div class="page-bar">
-      <button
-        class="pageButton"
-        v-if="Math.max(...pages) > 5"
-        @click="movePage(false)"
-      >
-        <span class="text" :style="{ fontWeight: 800 }"><</span>
-      </button>
-      <button
-        class="pageButton"
-        :class="currentPage === index ? 'clicked' : 'not-clicked'"
-        v-for="index in pages"
-        :key="index"
-        @click="setPage(index)"
-      >
-        <span class="text">{{ index }}</span>
-      </button>
-      <button
-        class="pageButton"
-        v-if="!pages.includes(totalPage)"
-        @click="movePage(true)"
-      >
-        <span class="text" :style="{ fontWeight: 800 }">></span>
-      </button>
-    </div>
+      <div class="page-bar">
+        <button
+          class="pageButton"
+          v-if="Math.max(...pages) > 5"
+          @click="movePage(false)"
+        >
+          <span class="text" :style="{ fontWeight: 800 }"> ></span>
+        </button>
+        <button
+          class="pageButton"
+          :class="getPage === index ? 'clicked' : 'not-clicked'"
+          v-for="index in pages"
+          :key="index"
+          @click="setPage(index)"
+        >
+          <span class="text">{{ index }}</span>
+        </button>
+        <button
+          class="pageButton"
+          v-if="!pages.includes(totalPage)"
+          @click="movePage(true)"
+        >
+          <span class="text" :style="{ fontWeight: 800 }">></span>
+        </button>
+      </div>
+    </template>
+    <template v-else>
+      <div id="loading-wrapper">
+        <Loading
+          :can-cancel="true"
+          :is-full-page="false"
+          :style="{ display: 'flex' }"
+          :opacity="0"
+        />
+      </div>
+    </template>
   </div>
 </template>
 
@@ -54,6 +72,10 @@ import { useScreen } from 'vue-screen';
 import Slide from '../components/Slide.vue';
 import { getEvents } from '@/api/event';
 import { event } from '@/types/index';
+import Loading from 'vue-loading-overlay';
+import 'vue-loading-overlay/dist/vue-loading.css';
+import VLazyImage from 'v-lazy-image';
+
 export default Vue.extend({
   name: 'HomeView',
   data: () => ({
@@ -62,9 +84,11 @@ export default Vue.extend({
     contentHeight: 'calc(50% - 5px)',
     textSize: '40px',
     totalPage: null as null | number,
-    currentPage: 1,
     events: [] as event[],
+    slides: [] as event[],
     pages: [] as number[],
+    eventLoading: false,
+    loading: false,
   }),
   methods: {
     scrollToTop() {
@@ -75,7 +99,8 @@ export default Vue.extend({
       const now = this.pages[this.pages.length - 1];
 
       if (plus) {
-        this.currentPage = now;
+        this.$store.commit('SET_PAGE', { type: 'userEvent', page: now });
+
         if ((this.totalPage as number) > future) {
           this.pages = [];
           for (let i = now; i < future; i++) {
@@ -89,7 +114,7 @@ export default Vue.extend({
         }
       } else {
         const first = this.pages[0];
-        this.currentPage = first - 4;
+        this.$store.commit('SET_PAGE', { type: 'userEvent', page: first - 4 });
         this.pages = [];
         for (let i = first - 5; i < first; i++) {
           this.pages.push(i + 1);
@@ -97,11 +122,13 @@ export default Vue.extend({
       }
     },
     setPage(page: number) {
-      this.currentPage = page;
+      this.$store.commit('SET_PAGE', { type: 'userEvent', page });
     },
   },
   components: {
     Slide,
+    Loading,
+    VLazyImage,
   },
   async created() {
     if (this.screen.width < 499) {
@@ -113,19 +140,30 @@ export default Vue.extend({
       this.contentHeight = 'calc(50% - 5px)';
       this.textSize = '40px';
     }
-    const {
-      data: { data },
-    } = await getEvents(6, this.currentPage - 1, '');
-    this.events = data.contents;
-    this.totalPage = data.total_page;
+    try {
+      const {
+        data: { data },
+      } = await getEvents(6, this.$store.state.page.userEvent - 1, '');
+      this.loading = true;
+      this.events = data.contents;
+      this.slides = data.contents;
+      this.totalPage = data.total_page;
 
-    if (this.totalPage > 5) {
-      this.pages = [1, 2, 3, 4, 5];
-    } else {
-      for (let i = 0; i < this.totalPage; i++) {
-        this.pages.push(i + 1);
+      if (this.totalPage > 5) {
+        this.pages = [1, 2, 3, 4, 5];
+      } else {
+        for (let i = 0; i < this.totalPage; i++) {
+          this.pages.push(i + 1);
+        }
       }
+    } catch (e) {
+      alert('서버오류입니다. 관리자에게 연락주세요.');
     }
+  },
+  computed: {
+    getPage() {
+      return this.$store.getters.getUserEventPage;
+    },
   },
   watch: {
     'screen.width': function (width: number) {
@@ -137,6 +175,16 @@ export default Vue.extend({
         this.height = '238px';
         this.contentHeight = 'calc(50% - 5px)';
         this.textSize = '40px';
+      }
+    },
+    async getPage(val: number) {
+      try {
+        const {
+          data: { data },
+        } = await getEvents(6, val - 1, '');
+        this.events = data.contents;
+      } catch (e) {
+        alert('서버오류입니다. 관리자에게 연락주세요.');
       }
     },
   },
@@ -296,5 +344,12 @@ export default Vue.extend({
   .not-clicked {
     border-color: transparent;
   }
+}
+
+#loading-wrapper {
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

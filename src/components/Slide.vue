@@ -6,13 +6,14 @@
         :style="{ transform: `translateX(${x}px)` }"
       >
         <router-link
-          to="/detail/12"
+          :to="`/detail/${slide.idx}`"
           class="card"
-          v-for="index in 6"
-          :key="index"
+          v-for="slide in slides"
+          :key="slide.idx"
         >
-          <img
-            :src="require('@/assets/img/horizontal.jpg')"
+          <VLazyImage
+            :src-placeholder="require('@/assets/img/loading.gif')"
+            :src="slide.slideImageUri"
             class="img"
             alt=""
           />
@@ -34,6 +35,9 @@
 <script lang="ts">
 import Vue from 'vue';
 import { useScreen } from 'vue-screen';
+import { PropType } from 'vue/types/v3-component-props';
+import { event } from '@/types/index';
+import VLazyImage from 'v-lazy-image';
 
 export default Vue.extend({
   name: 'SlideView',
@@ -45,6 +49,9 @@ export default Vue.extend({
       moving: 0,
       height: '200px',
     };
+  },
+  props: {
+    slides: [] as PropType<event[]>,
   },
   methods: {
     setMove() {
@@ -97,6 +104,9 @@ export default Vue.extend({
         this.height = '200px';
       }
     },
+  },
+  components: {
+    VLazyImage,
   },
 });
 </script>

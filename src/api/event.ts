@@ -24,16 +24,16 @@ const getEvents = (
   return api.get(`/events?size=${size}&page=${page}&query=${query}`);
 };
 
-const getEventByIdx = (idx: number): Promise<AxiosResponse<unknown>> => {
+const getEventByIdx = (idx: string): Promise<AxiosResponse<response>> => {
   return api.get(`/events/${idx}`);
 };
 
 const saveApply = (
-  idx: number,
+  idx: string,
   name: string,
   phone: string,
   clauseAgree: boolean
-): Promise<AxiosResponse<unknown>> => {
+): Promise<AxiosResponse<response>> => {
   return api.post(`/events/${idx}/applies`, { name, phone, clauseAgree });
 };
 

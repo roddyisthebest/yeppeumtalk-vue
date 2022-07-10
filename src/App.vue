@@ -18,7 +18,10 @@ export default Vue.extend({
 <style lang="scss">
 body {
   margin: 0;
-
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+  }
   min-height: 500px;
 }
 a {

@@ -28,14 +28,14 @@
           </button>
         </nav>
         <div class="navigation-container">
-          <router-link to="/" class="item">
+          <button class="item" @click="goRoute('/')">
             <span class="text">인기 이벤트</span>
             <font-awesome-icon icon="fa-solid fa-angle-right" class="icon" />
-          </router-link>
-          <router-link to="/" class="item">
+          </button>
+          <button class="item" @click="goRoute('')">
             <span class="text">입점/제휴문의</span>
             <font-awesome-icon icon="fa-solid fa-angle-right" class="icon" />
-          </router-link>
+          </button>
         </div>
       </div>
     </div>
@@ -51,7 +51,7 @@
       </div>
       <footer :style="{ paddingBottom: bottomPadding ? '230px' : '0px' }">
         <div id="nav-bar">
-          <router-link to="/" class="button">
+          <router-link to="/privacy" class="button">
             <span class="text">개인정보처리방침</span>
           </router-link>
           <span class="block"></span>
@@ -100,9 +100,23 @@ export default Vue.extend({
     goUp() {
       scrollTo({ top: 0, behavior: 'smooth' });
     },
+    goRoute(path: string) {
+      if (this.$route.path !== path) {
+        this.$router.push(`${path}`);
+      }
+      this.setNavigation();
+    },
   },
   created() {
-    console.log(this);
+    if (this.$route.name === 'home' || this.$route.name === 'privacy') {
+      if (this.bottomPadding) {
+        this.bottomPadding = false;
+      }
+    } else {
+      if (!this.bottomPadding) {
+        this.bottomPadding = true;
+      }
+    }
   },
   watch: {
     $route(to) {
@@ -140,6 +154,7 @@ export default Vue.extend({
       border-bottom: 1px solid #d8d8d8;
       background-color: white;
       text-decoration: none;
+      width: 100%;
       .text {
         font-size: 25px;
         color: black;

@@ -27,4 +27,15 @@ type event = {
   title: string;
 };
 
-export { response, event };
+type user = {
+  name: string | null;
+  accessToken: string | null;
+};
+
+type page = {
+  userEvent: number | null;
+  adminEvent: number | null;
+  user: number | null;
+};
+
+export { response, event, user, page };
