@@ -68,7 +68,7 @@
           >
         </div>
       </footer>
-      <button @click="goUp" class="goUpButton">
+      <button @click="goUp" class="goUpButton" v-if="display">
         <font-awesome-icon icon="fa-solid fa-up-long" />
       </button>
     </div>
@@ -86,6 +86,7 @@ export default Vue.extend({
       navigation: false,
       bottomPadding: false,
       width: '470px',
+      display: false,
     };
   },
   methods: {
@@ -117,6 +118,17 @@ export default Vue.extend({
         this.bottomPadding = true;
       }
     }
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        if (!this.display) {
+          this.display = true;
+        }
+      } else {
+        if (this.display) {
+          this.display = false;
+        }
+      }
+    });
   },
   watch: {
     $route(to) {
@@ -130,6 +142,19 @@ export default Vue.extend({
         }
       }
     },
+  },
+  beforeDestroy() {
+    window.removeEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        if (!this.display) {
+          this.display = true;
+        }
+      } else {
+        if (this.display) {
+          this.display = false;
+        }
+      }
+    });
   },
 });
 </script>

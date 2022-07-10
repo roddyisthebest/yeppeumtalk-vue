@@ -12,7 +12,6 @@ export default new Vuex.Store({
   state() {
     return {
       user: {
-        name: null,
         accessToken: null,
       },
       page: {
@@ -26,6 +25,9 @@ export default new Vuex.Store({
     getUserEventPage(state: State) {
       return state.page.userEvent;
     },
+    getAdminEventPage(state: State) {
+      return state.page.adminEvent;
+    },
   },
   mutations: {
     SET_PAGE(
@@ -34,7 +36,11 @@ export default new Vuex.Store({
     ) {
       state.page[payload.type] = payload.page;
     },
+    SET_TOKEN(state: State, accessToken: string) {
+      state.user.accessToken = accessToken;
+    },
   },
+
   actions: {},
   modules: {},
   plugins: [createPersistedState()],

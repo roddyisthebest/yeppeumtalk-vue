@@ -28,7 +28,6 @@ type event = {
 };
 
 type user = {
-  name: string | null;
   accessToken: string | null;
 };
 

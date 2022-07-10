@@ -16,24 +16,54 @@
           <span class="text one">제목</span>
           <span class="text two">생성날짜</span>
         </div>
-        <router-link
-          :to="`/admin/detail/${index}`"
-          class="item"
-          v-for="index in 7"
-          :key="index"
-        >
-          <span class="text zero">{{ index }}</span>
-          <span class="text one">제목</span>
-          <span class="text two">2022/01/24 12:01:20</span>
-        </router-link>
+        <template v-if="loading">
+          <router-link
+            :to="`/admin/detail/${event.idx}`"
+            class="item"
+            v-for="event in events"
+            :key="event.idx"
+          >
+            <span class="text zero">{{ event.idx }}</span>
+            <span class="text one">{{ event.title }}</span>
+            <span class="text two">2022/01/24 12:01:20</span>
+          </router-link>
+        </template>
+        <template v-else>
+          <div id="loading-wrapper">
+            <Loading
+              :can-cancel="true"
+              :is-full-page="false"
+              :style="{ display: 'flex' }"
+              :opacity="0"
+            />
+          </div>
+        </template>
       </div>
       <div id="pageWrapper">
-        <button class="button clicked">1</button>
-        <button class="button not-clicked">2</button>
-        <button class="button not-clicked">3</button>
-        <button class="button not-clicked">4</button>
-        <button class="button not-clicked">5</button>
-        <button class="button">></button>
+        <button
+          class="button"
+          v-if="Math.max(...pages) > 5"
+          @click="movePage(false)"
+        >
+          <font-awesome-icon icon="fa-solid fa-caret-left" />
+        </button>
+        <button
+          class="button"
+          v-for="index in pages"
+          :class="getPage === index ? 'clicked' : 'not-clicked'"
+          :key="index"
+          @click="setPage(index)"
+        >
+          {{ index }}
+        </button>
+
+        <button
+          class="button"
+          v-if="!pages.includes(totalPage)"
+          @click="movePage(true)"
+        >
+          <font-awesome-icon icon="fa-solid fa-caret-right" />
+        </button>
       </div>
     </div>
     <div id="block"></div>
@@ -117,6 +147,9 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { getEvents } from '@/api/event';
+import { event } from '@/types/index';
+import Loading from 'vue-loading-overlay';
 
 export default Vue.extend({
   name: 'AdminView',
@@ -130,6 +163,10 @@ export default Vue.extend({
       slideUrl: '',
       contentUrl: '',
       popup: false,
+      events: [] as event[],
+      pages: [] as number[],
+      totalPage: null as null | number,
+      loading: false,
     };
   },
   methods: {
@@ -144,24 +181,95 @@ export default Vue.extend({
       }
       if (e.target.name === 'thumb') {
         this.$data.thumbFile = e.target.files[0];
-        this.thumbUrl = e.target.files[0].name;
+        this.$data.thumbUrl = e.target.files[0].name;
       } else if (e.target.name === 'slide') {
         this.$data.slideFile = e.target.files[0];
-        this.slideUrl = e.target.files[0].name;
+        this.$data.slideUrl = e.target.files[0].name;
       } else {
         this.$data.contentFile = e.target.files[0];
-        this.contentUrl = e.target.files[0].name;
+        this.$data.contentUrl = e.target.files[0].name;
       }
     },
     reset() {
-      this.title = '';
-      this.thumbFile = {};
-      this.slideFile = {};
-      this.contentFile = {};
-      this.thumbUrl = '';
-      this.slideUrl = '';
-      this.contentUrl = '';
-      this.popup = false;
+      this.$data.title = '';
+      this.$data.thumbFile = {};
+      this.$data.slideFile = {};
+      this.$data.contentFile = {};
+      this.$data.thumbUrl = '';
+      this.$data.slideUrl = '';
+      this.$data.contentUrl = '';
+      this.$data.popup = false;
+    },
+    setPage(page: number) {
+      this.$store.commit('SET_PAGE', { type: 'adminEvent', page });
+    },
+    movePage(plus: boolean) {
+      const future = this.$data.pages[this.$data.pages.length - 1] + 5;
+      const now = this.$data.pages[this.$data.pages.length - 1];
+
+      if (plus) {
+        this.$store.commit('SET_PAGE', { type: 'adminEvent', page: now });
+
+        if ((this.$data.totalPage as number) > future) {
+          this.$data.pages = [];
+          for (let i = now; i < future; i++) {
+            this.$data.pages.push(i);
+          }
+        } else {
+          this.$data.pages = [];
+          for (let i = now; i < (this.$data.totalPage as number) + 1; i++) {
+            this.$data.pages.push(i);
+          }
+        }
+      } else {
+        const first = this.$data.pages[0];
+        console.log(first);
+        this.$store.commit('SET_PAGE', { type: 'adminEvent', page: first });
+        this.$data.pages = [];
+        for (let i = first - 5; i < first; i++) {
+          this.$data.pages.push(i + 1);
+        }
+      }
+    },
+  },
+  async created() {
+    try {
+      const {
+        data: { data },
+      } = await getEvents(7, this.$store.state.page.adminEvent - 1, '');
+      this.$data.loading = true;
+      this.$data.events = data.contents;
+      this.$data.totalPage = data.total_page;
+
+      if (this.$data.totalPage > 5) {
+        this.$data.pages = [1, 2, 3, 4, 5];
+      } else {
+        for (let i = 0; i < this.$data.totalPage; i++) {
+          this.$data.pages.push(i + 1);
+        }
+      }
+    } catch (e) {
+      alert('서버오류입니다. 관리자에게 연락주세요.');
+    }
+  },
+  components: {
+    Loading,
+  },
+  computed: {
+    getPage() {
+      return this.$store.getters.getAdminEventPage;
+    },
+  },
+  watch: {
+    async getPage(val: number) {
+      try {
+        const {
+          data: { data },
+        } = await getEvents(1, val - 1, '');
+        this.$data.events = data.contents;
+      } catch (e) {
+        alert('서버오류입니다. 관리자에게 연락주세요.');
+      }
     },
   },
 });
@@ -223,6 +331,7 @@ export default Vue.extend({
       display: flex;
       gap: 10px 0;
       flex-direction: column;
+      flex: 50;
       #itemHeader {
         width: calc(100% - 40px);
         height: 50px;
@@ -256,6 +365,13 @@ export default Vue.extend({
           font-weight: 500;
           text-align: start;
         }
+      }
+
+      #loading-wrapper {
+        height: 400px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
     }
     #pageWrapper {

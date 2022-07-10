@@ -1,22 +1,38 @@
 <template>
   <div id="auth-container">
     <span id="header">관리자 페이지</span>
-    <input type="text" class="loginInput" />
-    <input type="text" class="loginInput" />
-    <button class="button normal" @click="go('admin')">로그인</button>
-    <button class="button unNormal" @click="go('signup')">가입하기</button>
+    <input type="text" class="loginInput" v-model="email" />
+    <input type="password" class="loginInput" v-model="password" />
+    <button class="button normal" @click="logIn">로그인</button>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-
+import { login } from '@/api/user';
+import { setToken } from '@/api';
 export default Vue.extend({
   name: 'LoginView',
   methods: {
     go(location: string) {
       this.$router.push(`/${location}`);
     },
+    async logIn() {
+      try {
+        const { data }: any = await login(this.email, this.password);
+        this.$store.commit('SET_TOKEN', data.accessToken as string);
+        setToken(data.accessToken as string);
+        this.$router.push('/admin');
+      } catch (e: any) {
+        alert(e.response.data.errorMessage);
+      }
+    },
+  },
+  data() {
+    return {
+      email: '',
+      password: '',
+    };
   },
 });
 </script>

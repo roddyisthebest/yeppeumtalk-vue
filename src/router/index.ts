@@ -1,5 +1,7 @@
 import Vue from 'vue';
 import VueRouter, { RouteConfig } from 'vue-router';
+import store from '../store';
+
 Vue.use(VueRouter);
 
 const routes: Array<RouteConfig> = [
@@ -48,19 +50,32 @@ const routes: Array<RouteConfig> = [
     meta: { layout: 'Auth' },
     component: () => import('../views/Login.vue'),
   },
-
-  {
-    path: '/signup',
-    name: 'signup',
-    meta: { layout: 'Auth' },
-    component: () => import('../views/Signup.vue'),
-  },
 ];
 
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
   routes,
+});
+
+router.beforeEach((to, from, next) => {
+  const accessToken = store.state.user.accessToken;
+
+  if ((to.meta?.layout as string) === 'Admin') {
+    if (accessToken) {
+      next();
+    } else {
+      next('/login');
+    }
+  } else {
+    next();
+  }
+  // next();
+  // if ((to.meta?.layout as string) === 'admin' && accessToken) {
+  //   next();
+  // } else {
+  //   next('/login');
+  // }
 });
 
 export default router;

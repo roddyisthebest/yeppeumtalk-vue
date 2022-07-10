@@ -17,6 +17,7 @@ import {
   faCaretRight,
   faSearch,
   faImage,
+  faCaretLeft,
 } from '@fortawesome/free-solid-svg-icons';
 
 /* import font awesome icon component */
@@ -30,7 +31,8 @@ library.add(
   faUpLong,
   faCaretRight,
   faSearch,
-  faImage
+  faImage,
+  faCaretLeft
 );
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires

@@ -1,7 +1,8 @@
 import { AxiosResponse } from 'axios';
 import { api } from '.';
+import { response } from '@/types';
 
-const signUp = (
+const signup = (
   email: string,
   password: string
 ): Promise<AxiosResponse<unknown>> => {
@@ -11,8 +12,8 @@ const signUp = (
 const login = (
   email: string,
   password: string
-): Promise<AxiosResponse<unknown>> => {
+): Promise<AxiosResponse<response>> => {
   return api.post('/user/authentication', { email, password });
 };
 
-export { signUp, login };
+export { signup, login };
