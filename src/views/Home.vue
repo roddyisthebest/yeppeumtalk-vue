@@ -8,50 +8,57 @@
       </div>
     </div>
     <template v-if="loading">
-      <Slide :slides="slides" />
+      <template v-if="slides.length !== 0">
+        <Slide :slides="slides" />
 
-      <div class="contents-wrapper">
-        <div
-          class="content"
-          v-for="event in events"
-          :key="event.idx"
-          :style="{ height, width: $data.contentHeight }"
-        >
-          <router-link :to="`/detail/${event.idx}`" class="anchor">
-            <VLazyImage
-              :src="event.squareImageUri"
-              :src-placeholder="require('@/assets/img/loading.gif')"
-              class="img"
-              alt=""
-            />
-          </router-link>
+        <div class="contents-wrapper">
+          <div
+            class="content"
+            v-for="event in events"
+            :key="event.idx"
+            :style="{ height, width: $data.contentHeight }"
+          >
+            <router-link :to="`/detail/${event.idx}`" class="anchor">
+              <VLazyImage
+                :src="event.squareImageUri"
+                :src-placeholder="require('@/assets/img/loading.gif')"
+                class="img"
+                alt=""
+              />
+            </router-link>
+          </div>
         </div>
-      </div>
-      <div class="page-bar">
-        <button
-          class="pageButton"
-          v-if="Math.max(...pages) > 5"
-          @click="movePage(false)"
-        >
-          <span class="text" :style="{ fontWeight: 800 }"> ></span>
-        </button>
-        <button
-          class="pageButton"
-          :class="getPage === index ? 'clicked' : 'not-clicked'"
-          v-for="index in pages"
-          :key="index"
-          @click="setPage(index)"
-        >
-          <span class="text">{{ index }}</span>
-        </button>
-        <button
-          class="pageButton"
-          v-if="!pages.includes(totalPage)"
-          @click="movePage(true)"
-        >
-          <span class="text" :style="{ fontWeight: 800 }">></span>
-        </button>
-      </div>
+        <div class="page-bar">
+          <button
+            class="pageButton"
+            v-if="Math.max(...pages) > 5"
+            @click="movePage(false)"
+          >
+            <font-awesome-icon icon="fa-solid fa-caret-left" class="text" />
+          </button>
+          <button
+            class="pageButton"
+            :class="getPage === index ? 'clicked' : 'not-clicked'"
+            v-for="index in pages"
+            :key="index"
+            @click="setPage(index)"
+          >
+            <span class="text">{{ index }}</span>
+          </button>
+          <button
+            class="pageButton"
+            v-if="!pages.includes(totalPage)"
+            @click="movePage(true)"
+          >
+            <font-awesome-icon class="text" icon="fa-solid fa-caret-right" />
+          </button>
+        </div>
+      </template>
+      <template v-else>
+        <div id="loading-wrapper" :style="{ height: '500px' }">
+          <span id="text">등록된 이벤트가 없습니다.</span>
+        </div>
+      </template>
     </template>
     <template v-else>
       <div id="loading-wrapper">
@@ -80,7 +87,7 @@ export default Vue.extend({
   name: 'HomeView',
   data: () => ({
     screen: useScreen(),
-    height: '238px',
+    height: '100%',
     contentHeight: 'calc(50% - 5px)',
     textSize: '40px',
     totalPage: null as null | number,
@@ -100,15 +107,15 @@ export default Vue.extend({
 
       if (plus) {
         this.$store.commit('SET_PAGE', { type: 'userEvent', page: now });
-
+        console.log(this.totalPage);
         if ((this.totalPage as number) > future) {
           this.pages = [];
-          for (let i = now; i < future + 1; i++) {
+          for (let i = now; i < future; i++) {
             this.pages.push(i);
           }
         } else {
           this.pages = [];
-          for (let i = now; i <= (this.totalPage as number) + 1; i++) {
+          for (let i = now; i < (this.totalPage as number) + 1; i++) {
             this.pages.push(i);
           }
         }
@@ -131,28 +138,53 @@ export default Vue.extend({
     VLazyImage,
   },
   async created() {
+    console.log(this.screen.width);
     if (this.screen.width < 499) {
       this.height = '100%';
-      this.contentHeight = '100%';
+      this.contentHeight = 'calc(50% - 5px)';
       this.textSize = '10vw';
     } else {
-      this.height = '238px';
       this.contentHeight = 'calc(50% - 5px)';
       this.textSize = '40px';
     }
     try {
       const {
         data: { data },
-      } = await getEvents(6, this.$store.state.page.userEvent - 1, '');
+      } = await getEvents(4, this.$store.state.page.userEvent - 1, '');
       this.loading = true;
       this.events = data.contents;
       this.slides = data.contents;
-      this.totalPage = data.total_page;
+      this.totalPage = data.total_page + 1;
 
-      if (this.totalPage > 5) {
+      if (this.$store.state.page.userEvent !== 1) {
+        const power = Math.floor(this.$store.state.page.userEvent / 5);
+        if (power === 0) {
+          for (let i = 1; i < 6; i++) {
+            if (i < this.totalPage + 1) {
+              this.pages.push(i);
+            }
+          }
+          return;
+        }
+        var stand = 0;
+        if (power > 1) {
+          stand = power * 5 - 1;
+        } else {
+          stand = power * 5;
+        }
+        for (let i = stand; i < stand + 5; i++) {
+          if (i > this.totalPage) {
+            break;
+          }
+
+          this.pages.push(i);
+        }
+        return;
+      }
+      if (this.totalPage > 4) {
         this.pages = [1, 2, 3, 4, 5];
       } else {
-        for (let i = 0; i < this.totalPage + 1; i++) {
+        for (let i = 0; i < this.totalPage; i++) {
           this.pages.push(i + 1);
         }
       }
@@ -169,10 +201,10 @@ export default Vue.extend({
     'screen.width': function (width: number) {
       if (width < 499) {
         this.height = '100%';
-        this.contentHeight = '100%';
+        this.contentHeight = 'calc(50% - 5px)';
         this.textSize = '10vw';
       } else {
-        this.height = '238px';
+        // this.height = '238px';
         this.contentHeight = 'calc(50% - 5px)';
         this.textSize = '40px';
       }
@@ -181,7 +213,7 @@ export default Vue.extend({
       try {
         const {
           data: { data },
-        } = await getEvents(6, val - 1, '');
+        } = await getEvents(4, val - 1, '');
         this.events = data.contents;
       } catch (e) {
         alert('서버오류입니다. 관리자에게 연락주세요.');
@@ -270,11 +302,12 @@ export default Vue.extend({
 .contents-wrapper {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-evenly;
-
+  justify-content: space-between;
+  gap: 10px 0;
   margin-top: 30px;
   width: 100%;
-
+  padding: 0 40px;
+  width: calc(100% - 80px);
   .content {
     /* $width: calc(50% - 5px); */
     /* width: $width; */
@@ -290,15 +323,15 @@ export default Vue.extend({
     align-items: center;
     justify-content: center;
     .anchor {
-      width: 93%;
-      height: 93%;
+      width: 100%;
       border-radius: 30px;
       /* border: 10px solid transparent; */
       &:hover {
         border: 10px solid #ff3e9b;
       }
-      border: 10px solid transparent;
-
+      /* border: 10px solid transparent; */
+      display: flex;
+      align-items: center;
       .img {
         width: 100%;
         height: 100%;
@@ -351,5 +384,11 @@ export default Vue.extend({
   display: flex;
   align-items: center;
   justify-content: center;
+
+  #text {
+    font-size: 25px;
+    font-weight: 500;
+    color: black;
+  }
 }
 </style>

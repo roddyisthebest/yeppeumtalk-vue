@@ -2,7 +2,7 @@ import { AxiosResponse } from 'axios';
 import { api } from '.';
 
 const updateLink = (formData: FormData): Promise<AxiosResponse<unknown>> => {
-  return api.put('/links', { formData });
+  return api.put('/links', formData);
 };
 
 const getLink = (): Promise<AxiosResponse<unknown>> => {

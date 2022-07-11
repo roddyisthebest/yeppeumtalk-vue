@@ -4,7 +4,7 @@
       <div id="titleWrapper">
         <span id="title">링크</span>
         <button id="button" v-if="!edit" @click="edit = true">수정</button>
-        <button id="button" v-else @click="edit = false">저장</button>
+        <button id="button" v-else @click="updateLink">저장</button>
       </div>
       <input type="text" id="input" v-model="link" :disabled="!edit" />
     </div>
@@ -13,11 +13,31 @@
 
 <script lang="ts">
 import Vue from 'vue';
-
+import { getLink, updateLink } from '@/api/link';
 export default Vue.extend({
   name: 'LinkView',
   data() {
     return { link: '', edit: false };
+  },
+  async created() {
+    try {
+      const { data } = await getLink();
+      this.link = data.data;
+    } catch (e: any) {
+      alert(e.response.data.errorMessage);
+    }
+  },
+  methods: {
+    async updateLink() {
+      this.edit = false;
+      const formData = new FormData();
+      formData.append('url', this.link);
+      try {
+        const { data } = await updateLink(formData);
+      } catch (e) {
+        alert(e.response.data.errorMessage);
+      }
+    },
   },
 });
 </script>

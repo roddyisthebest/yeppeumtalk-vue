@@ -12,7 +12,7 @@
           :key="slide.idx"
         >
           <VLazyImage
-            :src-placeholder="require('@/assets/img/loading.gif')"
+            :src-placeholder="require('@/assets/img/loadingHorizontal.png')"
             :src="slide.slideImageUri"
             class="img"
             alt=""
@@ -22,7 +22,7 @@
     </div>
     <div class="scroll-bar">
       <span
-        v-for="index in 6"
+        v-for="index in slides.length"
         :key="index"
         class="scrollButton"
         :class="moving === index - 1 ? 'clicked' : 'not-clicked'"
@@ -78,7 +78,7 @@ export default Vue.extend({
     }
     setInterval(() => {
       this.moving += 1;
-      if (this.moving > 5) {
+      if (this.moving >= this.slides.length) {
         if (screen.width < 500) {
           this.x = (screen.width - screen.width * 0.8) / 2;
         } else {
@@ -151,6 +151,7 @@ export default Vue.extend({
     height: 10px;
     border: none;
     border-radius: 10px;
+    cursor: pointer;
   }
   .clicked {
     background-color: #5b5b5b;

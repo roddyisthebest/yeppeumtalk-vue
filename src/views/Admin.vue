@@ -3,8 +3,12 @@
     <div id="left">
       <div id="searchBarWrapper">
         <div id="searchBar">
-          <input class="input" placeholder="이벤트 제목으로 검색해보세요." />
-          <button id="button">
+          <input
+            class="input"
+            placeholder="이벤트 제목으로 검색해보세요."
+            v-model="query"
+          />
+          <button id="button" @click="getData">
             <font-awesome-icon icon="fa-solid fa-search" />
           </button>
         </div>
@@ -17,17 +21,26 @@
           <span class="text two">생성날짜</span>
         </div>
         <template v-if="loading">
-          <router-link
-            :to="`/admin/detail/${event.idx}`"
-            class="item"
-            :class="event.idx === parseInt(idx) ? 'clicked' : 'not-clicked'"
-            v-for="event in events"
-            :key="event.idx"
-          >
-            <span class="text zero">{{ event.idx }}</span>
-            <span class="text one">{{ event.title }}</span>
-            <span class="text two">2022/01/24 12:01:20</span>
-          </router-link>
+          <template v-if="events.length">
+            <router-link
+              :to="`/admin/detail/${event.idx}`"
+              class="item"
+              :class="event.idx === parseInt(idx) ? 'clicked' : 'not-clicked'"
+              v-for="event in events"
+              :key="event.idx"
+            >
+              <span class="text zero">{{ event.idx }}</span>
+              <span class="text one">{{ event.title }}</span>
+              <span class="text two">{{
+                moment(event.createdAt).format('YYYY-MM-DD HH:MM')
+              }}</span>
+            </router-link>
+          </template>
+          <template v-else>
+            <div id="loading-wrapper">
+              <span>이벤트가 없습니다.</span>
+            </div>
+          </template>
         </template>
         <template v-else>
           <div id="loading-wrapper">
@@ -40,7 +53,7 @@
           </div>
         </template>
       </div>
-      <div id="pageWrapper">
+      <div id="pageWrapper" v-if="events.length">
         <button
           class="button"
           v-if="Math.max(...pages) > 5"
@@ -60,7 +73,7 @@
 
         <button
           class="button"
-          v-if="Math.max(...pages) < totalPage + 1"
+          v-if="!pages.includes(totalPage)"
           @click="movePage(true)"
         >
           <font-awesome-icon icon="fa-solid fa-caret-right" />
@@ -75,8 +88,11 @@
     <div id="popup" v-if="popup">
       <div id="popup-container">
         <div id="buttonWrapper">
-          <button class="button">생성</button>
-          <button class="button" @click="reset">취소</button>
+          <template v-if="!saveLoading">
+            <button class="button notLoading" @click="submit">생성</button>
+            <button class="button notLoading" @click="reset">취소</button>
+          </template>
+          <button class="button loading" v-else>생성중</button>
         </div>
         <span class="sectionTitle">제목</span>
         <input type="text" class="input" v-model="$data.title" />
@@ -148,9 +164,10 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { getEvents } from '@/api/event';
+import { getEvents, saveEvent } from '@/api/event';
 import { event } from '@/types/index';
 import Loading from 'vue-loading-overlay';
+import moment from 'moment';
 
 export default Vue.extend({
   name: 'AdminView',
@@ -169,6 +186,10 @@ export default Vue.extend({
       totalPage: null as null | number,
       loading: false,
       idx: null as null | number,
+      saveLoading: false,
+      moment,
+      query: '',
+      page: 1 as number,
     };
   },
   methods: {
@@ -201,35 +222,30 @@ export default Vue.extend({
       this.$data.slideUrl = '';
       this.$data.contentUrl = '';
       this.$data.popup = false;
+      this.$data.query = '';
     },
     setPage(page: number) {
-      this.$store.commit('SET_PAGE', { type: 'adminEvent', page });
+      this.$data.page = page;
     },
     movePage(plus: boolean) {
       const future = this.$data.pages[this.$data.pages.length - 1] + 5;
-      console.log('future' + future);
       const now = this.$data.pages[this.$data.pages.length - 1];
-      console.log('now' + now);
       if (plus) {
-        this.$store.commit('SET_PAGE', { type: 'adminEvent', page: now });
-        if (((this.$data.totalPage + 1) as number) > future) {
+        this.$data.page = now;
+        if ((this.$data.totalPage as number) > future) {
           this.$data.pages = [];
           for (let i = now; i < future; i++) {
             this.$data.pages.push(i);
           }
         } else {
           this.$data.pages = [];
-          for (let i = now; i < ((this.$data.totalPage + 1) as number); i++) {
-            console.log(i);
+          for (let i = now; i < (this.$data.totalPage as number) + 1; i++) {
             this.$data.pages.push(i);
           }
         }
-
-        console.log('total' + this.$data.totalPage);
       } else {
         const first = this.$data.pages[0];
-        console.log(first);
-        this.$store.commit('SET_PAGE', { type: 'adminEvent', page: first });
+        this.$data.page = first;
         this.$data.pages = [];
         for (let i = first - 5; i < first; i++) {
           this.$data.pages.push(i + 1);
@@ -237,25 +253,76 @@ export default Vue.extend({
       }
       this.$data.idx = null;
     },
+    async submit() {
+      const formData = new FormData();
+      formData.append('title', this.$data.title);
+      formData.append(`square`, this.$data.thumbFile);
+      formData.append(`content`, this.$data.contentFile);
+      formData.append(`slide`, this.$data.slideFile);
+      this.$data.saveLoading = true;
+      try {
+        await saveEvent(formData);
+      } catch (e: any) {
+        alert(e.response.data.errorMessage);
+      } finally {
+        await this.getData();
+        this.reset();
+        alert('이벤트가 성공적으로 등록되었습니다.');
+        this.$data.saveLoading = false;
+        this.$data.popup = false;
+      }
+    },
+    async getData(page: number) {
+      this.$data.page = 1;
+      try {
+        this.$data.loading = false;
+        const {
+          data: { data },
+        } = await getEvents(7, page - 1, this.$data.query);
+        this.$data.events = data.contents;
+        this.$data.totalPage = data.total_page + 1;
+        this.$data.pages = [];
+
+        if (this.$data.totalPage > 4) {
+          this.$data.pages = [1, 2, 3, 4, 5];
+        } else {
+          for (let i = 0; i < this.$data.totalPage; i++) {
+            this.$data.pages.push(i + 1);
+          }
+        }
+        this.$data.loading = true;
+      } catch (e) {
+        alert('서버오류입니다. 관리자에게 연락주세요.');
+      } finally {
+        this.$router.push('/admin');
+      }
+    },
+    // async search() {
+    //   try {
+    //     const { data } = await getEvents(7, 0, '');
+    //   } catch (e) {
+    //     console.log(e);
+    //   }
+    // },
   },
   async created() {
     this.$data.idx = this.$route.params.idx;
-
     try {
       const {
         data: { data },
-      } = await getEvents(3, this.$store.state.page.adminEvent - 1, '');
+      } = await getEvents(7, this.$data.page - 1, this.$data.query);
+      this.$data.loading = true;
       this.$data.events = data.contents;
-      this.$data.totalPage = data.total_page;
+      this.$data.slides = data.contents;
+      this.$data.totalPage = data.total_page + 1;
 
-      if (this.$data.totalPage > 5) {
+      if (this.$data.totalPage > 4) {
         this.$data.pages = [1, 2, 3, 4, 5];
       } else {
-        for (let i = 0; i < this.$data.totalPage + 1; i++) {
+        for (let i = 0; i < this.$data.totalPage; i++) {
           this.$data.pages.push(i + 1);
         }
       }
-      this.$data.loading = true;
     } catch (e) {
       alert('서버오류입니다. 관리자에게 연락주세요.');
     }
@@ -265,7 +332,10 @@ export default Vue.extend({
   },
   computed: {
     getPage() {
-      return this.$store.getters.getAdminEventPage;
+      return this.$data.page;
+    },
+    getUpdate() {
+      return this.$store.getters.getUpdate;
     },
   },
   watch: {
@@ -273,7 +343,7 @@ export default Vue.extend({
       try {
         const {
           data: { data },
-        } = await getEvents(3, val - 1, '');
+        } = await getEvents(7, val - 1, this.$data.query);
         this.$data.events = data.contents;
       } catch (e) {
         alert('서버오류입니다. 관리자에게 연락주세요.');
@@ -282,6 +352,14 @@ export default Vue.extend({
     $route(to) {
       this.$data.idx = to.params.idx;
       console.log(this.$data.idx);
+    },
+    async getUpdate(val: boolean) {
+      if (val) {
+        this.$data.page = 1;
+        this.$store.commit('SET_UPDATE', false);
+        this.reset();
+        this.getData(1);
+      }
     },
   },
 });
@@ -498,10 +576,17 @@ export default Vue.extend({
         .button {
           width: 50px;
           height: 25px;
-          background-color: #8c8c8c;
-          color: white;
+
           font-size: 10px;
           font-weight: 500;
+        }
+        .notLoading {
+          background-color: #8c8c8c;
+          color: white;
+        }
+        .loading {
+          background-color: white;
+          color: #8c8c8c;
         }
       }
     }

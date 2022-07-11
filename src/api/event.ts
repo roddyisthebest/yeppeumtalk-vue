@@ -2,7 +2,9 @@ import { AxiosResponse } from 'axios';
 import { api } from '.';
 import { response } from '@/types';
 const saveEvent = (formData: FormData): Promise<AxiosResponse<unknown>> => {
-  return api.post('/events', { formData });
+  return api.post('/events', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
 };
 
 const updateEvent = (
@@ -12,11 +14,9 @@ const updateEvent = (
   for (const key of formData.keys()) {
     console.log(key, ':', formData.get(key));
   }
-  return api.put(
-    `/events/${idx}`,
-    { formData },
-    { headers: { 'Content-Type': 'multipart/form-data' } }
-  );
+  return api.post(`/events/${idx}`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
 };
 
 const deleteEvent = (idx: number): Promise<AxiosResponse<unknown>> => {

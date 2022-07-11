@@ -4,32 +4,63 @@
       <span id="title">이벤트 idx:{{ $data.idx }}</span>
       <div id="buttonWrapper">
         <template v-if="!$data.edit">
-          <button class="button">삭제</button>
-          <button class="button" @click="setEdit">수정</button>
+          <button class="button notLoading" @click="deleteEvent">삭제</button>
+          <button class="button notLoading" @click="setEdit">수정</button>
         </template>
         <template v-else>
-          <button class="button" @click="submit">저장</button>
+          <button class="button notLoading" @click="submit" v-if="!saveLoading">
+            저장
+          </button>
+          <button class="button loading" v-else>저장중</button>
         </template>
       </div>
     </div>
     <template v-if="!$data.edit">
       <span class="sectionTitle">제목</span>
       <input type="text" class="input" v-model="$data.title" :disabled="true" />
-      <span class="sectionTitle">썸네일 이미지</span>
+      <div
+        :style="{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }"
+      >
+        <span class="sectionTitle">썸네일 이미지</span>
+        <a :href="$data.thumbUrl" target="_blank">미리보기</a>
+      </div>
       <input
         type="text"
         class="input"
         :disabled="true"
         :value="$data.thumbUrl"
       />
-      <span class="sectionTitle">슬라이드 이미지</span>
+
+      <div
+        :style="{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }"
+      >
+        <span class="sectionTitle">슬라이드 이미지</span>
+        <a :href="$data.slideUrl" target="_blank">미리보기</a>
+      </div>
       <input
         type="text"
         class="input"
         :disabled="true"
         :value="$data.slideUrl"
       />
-      <span class="sectionTitle">게시물 이미지</span>
+      <div
+        :style="{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }"
+      >
+        <span class="sectionTitle">게시물 이미지</span>
+        <a :href="$data.contentUrl" target="_blank">미리보기</a>
+      </div>
       <input
         type="text"
         class="input"
@@ -68,7 +99,7 @@
         </button>
         <button
           class="button"
-          v-if="Math.max(...pages) < totalPage + 1 && totalPage !== -1"
+          v-if="!pages.includes(totalPage) && totalPage !== 0"
           @click="movePage(true)"
         >
           <font-awesome-icon icon="fa-solid fa-caret-right" />
@@ -145,7 +176,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { getEventByIdx, getApply, updateEvent } from '@/api/event';
+import { getEventByIdx, getApply, updateEvent, deleteEvent } from '@/api/event';
 import { applicant } from '@/types';
 export default Vue.extend({
   name: 'AdminDetailView',
@@ -165,6 +196,7 @@ export default Vue.extend({
       loading: false,
       pages: [] as number[],
       zero: false,
+      saveLoading: false,
     };
   },
   async created() {
@@ -182,7 +214,7 @@ export default Vue.extend({
       try {
         const {
           data: { data },
-        } = await getApply(this.$route.params.idx, val - 1, 1);
+        } = await getApply(this.$route.params.idx, val - 1, 10);
         this.applies = data.contents;
       } catch (e) {
         alert('서버오류입니다. 관리자에게 연락주세요.');
@@ -214,27 +246,45 @@ export default Vue.extend({
       }
     },
     async submit() {
+      const formData = new FormData();
+      this.saveLoading = true;
       if (this.thumbUrl.includes('http')) {
-        //
+        console.log(this.thumbUrl);
+        formData.append('square', await this.dataURItoBlob(this.thumbUrl));
+      } else {
+        formData.append('square', this.$data.thumbFile);
       }
       if (this.slideUrl.includes('http')) {
-        //
+        formData.append('slide', await this.dataURItoBlob(this.slideUrl));
+      } else {
+        formData.append('slide', this.$data.slideFile);
       }
       if (this.contentUrl.includes('http')) {
-        //
+        formData.append('content', await this.dataURItoBlob(this.contentUrl));
+      } else {
+        formData.append('content', this.$data.contentFile);
       }
-      const formData = new FormData();
-      formData.append('title', this.title);
+      formData.append('title', this.$data.title);
 
-      console.log(this.$data.thumbFile);
-      console.log(this.$data.contentFile);
-      console.log(this.$data.slideFile);
-      formData.append('square', this.$data.thumbFile);
-      formData.append('content', this.$data.contentFile);
-      formData.append('slide', this.$data.slideFile);
-
-      const { data } = await updateEvent(formData, this.$route.params.idx);
-      console.log(data);
+      try {
+        await updateEvent(formData, this.$route.params.idx);
+        alert('이벤트 정보가 성공적으로 변경되었습니다.');
+        await this.setData();
+        this.setEdit();
+      } catch (e: any) {
+        alert(e.response.data.errorMessage);
+      } finally {
+        this.saveLoading = false;
+      }
+    },
+    async deleteEvent() {
+      try {
+        if (window.confirm('정말 삭제하기를 원하십니까?')) {
+          await deleteEvent(this.$route.params.idx);
+          await this.$store.commit('SET_UPDATE', true);
+          await this.$router.push('/admin');
+        }
+      } catch (e: any) {}
     },
     async setData() {
       this.$data.pages = [];
@@ -254,15 +304,15 @@ export default Vue.extend({
         } = await getApply(
           this.$route.params.idx,
           this.$store.state.page.user - 1,
-          1
+          10
         );
         this.applies = apply.contents;
-        this.totalPage = apply.total_page;
+        this.totalPage = apply.total_page + 1;
         if (this.$data.totalPage > 5) {
           this.$data.pages = [1, 2, 3, 4, 5];
         } else {
           console.log(this.$data.totalPage);
-          for (let i = 0; i < this.$data.totalPage + 1; i++) {
+          for (let i = 0; i < this.$data.totalPage; i++) {
             this.$data.pages.push(i + 1);
           }
         }
@@ -288,7 +338,7 @@ export default Vue.extend({
           }
         } else {
           this.pages = [];
-          for (let i = now; i < (this.totalPage as number) + 2; i++) {
+          for (let i = now; i < (this.totalPage as number) + 1; i++) {
             this.pages.push(i);
           }
         }
@@ -305,6 +355,14 @@ export default Vue.extend({
     setPage(page: number) {
       this.$store.commit('SET_PAGE', { type: 'user', page });
     },
+    async dataURItoBlob(url: any) {
+      const response = await fetch(url);
+      const data = await response.blob();
+      const ext = 'png'; // url 구조에 맞게 수정할 것
+      const filename = 'before'; // url 구조에 맞게 수정할 것
+      const metadata = { type: `image/${ext}` };
+      return new File([data], filename!, metadata);
+    },
   },
   computed: {
     getPage() {
@@ -315,6 +373,9 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
+a {
+  color: blue;
+}
 #detail-container {
   flex: 1;
   display: flex;
@@ -339,12 +400,18 @@ export default Vue.extend({
       display: flex;
       align-items: center;
       gap: 0 10px;
-
+      .notLoading {
+        background-color: #8c8c8c;
+        color: white;
+      }
+      .loading {
+        background-color: white;
+        color: #8c8c8c;
+      }
       .button {
         width: 50px;
         height: 25px;
-        background-color: #8c8c8c;
-        color: white;
+
         font-size: 10px;
         font-weight: 500;
       }
@@ -411,6 +478,7 @@ export default Vue.extend({
       background-color: transparent;
       width: 80%;
     }
+
     .button {
       border: 1px solid #cacaca;
       background-color: transparent;
