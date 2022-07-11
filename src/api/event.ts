@@ -9,7 +9,14 @@ const updateEvent = (
   formData: FormData,
   idx: number
 ): Promise<AxiosResponse<unknown>> => {
-  return api.put(`/events/${idx}`, { formData });
+  for (const key of formData.keys()) {
+    console.log(key, ':', formData.get(key));
+  }
+  return api.put(
+    `/events/${idx}`,
+    { formData },
+    { headers: { 'Content-Type': 'multipart/form-data' } }
+  );
 };
 
 const deleteEvent = (idx: number): Promise<AxiosResponse<unknown>> => {
@@ -24,7 +31,7 @@ const getEvents = (
   return api.get(`/events?size=${size}&page=${page}&query=${query}`);
 };
 
-const getEventByIdx = (idx: string): Promise<AxiosResponse<response>> => {
+const getEventByIdx = (idx: string): Promise<AxiosResponse<any>> => {
   return api.get(`/events/${idx}`);
 };
 
@@ -38,7 +45,7 @@ const saveApply = (
 };
 
 const getApply = (
-  idx: number,
+  idx: string,
   page: number,
   size: number
 ): Promise<AxiosResponse<unknown>> => {

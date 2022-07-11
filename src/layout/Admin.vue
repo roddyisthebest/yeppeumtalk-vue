@@ -74,6 +74,7 @@ export default Vue.extend({
   height: 100vh;
   width: 100%;
   display: flex;
+  min-width: 1100px;
   #left {
     flex: 1;
     background-color: white;

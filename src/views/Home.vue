@@ -103,18 +103,18 @@ export default Vue.extend({
 
         if ((this.totalPage as number) > future) {
           this.pages = [];
-          for (let i = now; i < future; i++) {
+          for (let i = now; i < future + 1; i++) {
             this.pages.push(i);
           }
         } else {
           this.pages = [];
-          for (let i = now; i < (this.totalPage as number) + 1; i++) {
+          for (let i = now; i <= (this.totalPage as number) + 1; i++) {
             this.pages.push(i);
           }
         }
       } else {
         const first = this.pages[0];
-        this.$store.commit('SET_PAGE', { type: 'userEvent', page: first - 4 });
+        this.$store.commit('SET_PAGE', { type: 'userEvent', page: first });
         this.pages = [];
         for (let i = first - 5; i < first; i++) {
           this.pages.push(i + 1);
@@ -152,7 +152,7 @@ export default Vue.extend({
       if (this.totalPage > 5) {
         this.pages = [1, 2, 3, 4, 5];
       } else {
-        for (let i = 0; i < this.totalPage; i++) {
+        for (let i = 0; i < this.totalPage + 1; i++) {
           this.pages.push(i + 1);
         }
       }

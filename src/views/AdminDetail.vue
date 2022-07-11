@@ -8,7 +8,7 @@
           <button class="button" @click="setEdit">수정</button>
         </template>
         <template v-else>
-          <button class="button" @click="setEdit">저장</button>
+          <button class="button" @click="submit">저장</button>
         </template>
       </div>
     </div>
@@ -43,24 +43,36 @@
           <span class="text one">이름</span>
           <span class="text two">번호</span>
         </div>
-        <div
-          :to="`/admin/detail/${index}`"
-          class="item"
-          v-for="index in 7"
-          :key="index"
-        >
-          <span class="text zero">{{ index }}</span>
-          <span class="text one">제목</span>
-          <span class="text two">01051529445</span>
+        <div class="item" v-for="apply in applies" :key="apply.idx">
+          <span class="text zero">{{ apply.idx }}</span>
+          <span class="text one">{{ apply.name }}</span>
+          <span class="text two">{{ apply.phone }}</span>
         </div>
       </div>
       <div id="pageWrapper">
-        <button class="button clicked">1</button>
-        <button class="button not-clicked">2</button>
-        <button class="button not-clicked">3</button>
-        <button class="button not-clicked">4</button>
-        <button class="button not-clicked">5</button>
-        <button class="button">></button>
+        <button
+          class="button"
+          v-if="Math.max(...pages) > 5"
+          @click="movePage(false)"
+        >
+          <font-awesome-icon icon="fa-solid fa-caret-left" />
+        </button>
+        <button
+          class="button"
+          v-for="index in pages"
+          :class="getPage === index ? 'clicked' : 'not-clicked'"
+          :key="index"
+          @click="setPage(index)"
+        >
+          {{ index }}
+        </button>
+        <button
+          class="button"
+          v-if="Math.max(...pages) < totalPage + 1 && totalPage !== -1"
+          @click="movePage(true)"
+        >
+          <font-awesome-icon icon="fa-solid fa-caret-right" />
+        </button>
       </div>
     </template>
     <template v-else>
@@ -133,7 +145,8 @@
 
 <script lang="ts">
 import Vue from 'vue';
-
+import { getEventByIdx, getApply, updateEvent } from '@/api/event';
+import { applicant } from '@/types';
 export default Vue.extend({
   name: 'AdminDetailView',
   data() {
@@ -147,14 +160,33 @@ export default Vue.extend({
       thumbUrl: '',
       slideUrl: '',
       contentUrl: '',
+      applies: [] as applicant[],
+      totalPage: null as null | number,
+      loading: false,
+      pages: [] as number[],
+      zero: false,
     };
   },
-  created() {
+  async created() {
     this.$data.idx = this.$route.params.idx;
+    await this.setData();
+
+    this.$data.loading = true;
   },
   watch: {
-    $route() {
+    async $route() {
       this.$data.idx = this.$route.params.idx;
+      await this.setData();
+    },
+    async getPage(val: number) {
+      try {
+        const {
+          data: { data },
+        } = await getApply(this.$route.params.idx, val - 1, 1);
+        this.applies = data.contents;
+      } catch (e) {
+        alert('서버오류입니다. 관리자에게 연락주세요.');
+      }
     },
   },
   methods: {
@@ -181,6 +213,103 @@ export default Vue.extend({
         this.contentUrl = e.target.files[0].name;
       }
     },
+    async submit() {
+      if (this.thumbUrl.includes('http')) {
+        //
+      }
+      if (this.slideUrl.includes('http')) {
+        //
+      }
+      if (this.contentUrl.includes('http')) {
+        //
+      }
+      const formData = new FormData();
+      formData.append('title', this.title);
+
+      console.log(this.$data.thumbFile);
+      console.log(this.$data.contentFile);
+      console.log(this.$data.slideFile);
+      formData.append('square', this.$data.thumbFile);
+      formData.append('content', this.$data.contentFile);
+      formData.append('slide', this.$data.slideFile);
+
+      const { data } = await updateEvent(formData, this.$route.params.idx);
+      console.log(data);
+    },
+    async setData() {
+      this.$data.pages = [];
+      this.$store.commit('SET_PAGE', { type: 'user', page: 1 });
+
+      try {
+        const {
+          data: { data: event },
+        } = await getEventByIdx(this.$route.params.idx);
+        this.title = event.title;
+        this.thumbUrl = event.squareImageUri;
+        this.slideUrl = event.slideImageUri;
+        this.contentUrl = event.contentImageUri;
+
+        const {
+          data: { data: apply },
+        } = await getApply(
+          this.$route.params.idx,
+          this.$store.state.page.user - 1,
+          1
+        );
+        this.applies = apply.contents;
+        this.totalPage = apply.total_page;
+        if (this.$data.totalPage > 5) {
+          this.$data.pages = [1, 2, 3, 4, 5];
+        } else {
+          console.log(this.$data.totalPage);
+          for (let i = 0; i < this.$data.totalPage + 1; i++) {
+            this.$data.pages.push(i + 1);
+          }
+        }
+        console.log(apply.total_page);
+        if (apply.total_page === 0) {
+          this.zero = false;
+        }
+      } catch (e: any) {
+        alert(e.response.data.errorMessage);
+      }
+    },
+    movePage(plus: boolean) {
+      const future = this.pages[this.pages.length - 1] + 5;
+      const now = this.pages[this.pages.length - 1];
+
+      if (plus) {
+        this.$store.commit('SET_PAGE', { type: 'user', page: now });
+
+        if ((this.totalPage as number) > future) {
+          this.pages = [];
+          for (let i = now; i < future; i++) {
+            this.pages.push(i);
+          }
+        } else {
+          this.pages = [];
+          for (let i = now; i < (this.totalPage as number) + 2; i++) {
+            this.pages.push(i);
+          }
+        }
+        console.log(this.pages, this.totalPage);
+      } else {
+        const first = this.pages[0];
+        this.$store.commit('SET_PAGE', { type: 'user', page: first });
+        this.pages = [];
+        for (let i = first - 5; i < first; i++) {
+          this.pages.push(i + 1);
+        }
+      }
+    },
+    setPage(page: number) {
+      this.$store.commit('SET_PAGE', { type: 'user', page });
+    },
+  },
+  computed: {
+    getPage() {
+      return this.$store.getters.getUserPage;
+    },
   },
 });
 </script>
@@ -192,7 +321,6 @@ export default Vue.extend({
   background-color: white;
   padding: 30px;
   flex-direction: column;
-  overflow-y: scroll;
   gap: 18.5px 0;
 
   #titleWrapper {

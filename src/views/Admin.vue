@@ -20,6 +20,7 @@
           <router-link
             :to="`/admin/detail/${event.idx}`"
             class="item"
+            :class="event.idx === parseInt(idx) ? 'clicked' : 'not-clicked'"
             v-for="event in events"
             :key="event.idx"
           >
@@ -59,7 +60,7 @@
 
         <button
           class="button"
-          v-if="!pages.includes(totalPage)"
+          v-if="Math.max(...pages) < totalPage + 1"
           @click="movePage(true)"
         >
           <font-awesome-icon icon="fa-solid fa-caret-right" />
@@ -167,6 +168,7 @@ export default Vue.extend({
       pages: [] as number[],
       totalPage: null as null | number,
       loading: false,
+      idx: null as null | number,
     };
   },
   methods: {
@@ -205,22 +207,25 @@ export default Vue.extend({
     },
     movePage(plus: boolean) {
       const future = this.$data.pages[this.$data.pages.length - 1] + 5;
+      console.log('future' + future);
       const now = this.$data.pages[this.$data.pages.length - 1];
-
+      console.log('now' + now);
       if (plus) {
         this.$store.commit('SET_PAGE', { type: 'adminEvent', page: now });
-
-        if ((this.$data.totalPage as number) > future) {
+        if (((this.$data.totalPage + 1) as number) > future) {
           this.$data.pages = [];
           for (let i = now; i < future; i++) {
             this.$data.pages.push(i);
           }
         } else {
           this.$data.pages = [];
-          for (let i = now; i < (this.$data.totalPage as number) + 1; i++) {
+          for (let i = now; i < ((this.$data.totalPage + 1) as number); i++) {
+            console.log(i);
             this.$data.pages.push(i);
           }
         }
+
+        console.log('total' + this.$data.totalPage);
       } else {
         const first = this.$data.pages[0];
         console.log(first);
@@ -230,24 +235,27 @@ export default Vue.extend({
           this.$data.pages.push(i + 1);
         }
       }
+      this.$data.idx = null;
     },
   },
   async created() {
+    this.$data.idx = this.$route.params.idx;
+
     try {
       const {
         data: { data },
-      } = await getEvents(7, this.$store.state.page.adminEvent - 1, '');
-      this.$data.loading = true;
+      } = await getEvents(3, this.$store.state.page.adminEvent - 1, '');
       this.$data.events = data.contents;
       this.$data.totalPage = data.total_page;
 
       if (this.$data.totalPage > 5) {
         this.$data.pages = [1, 2, 3, 4, 5];
       } else {
-        for (let i = 0; i < this.$data.totalPage; i++) {
+        for (let i = 0; i < this.$data.totalPage + 1; i++) {
           this.$data.pages.push(i + 1);
         }
       }
+      this.$data.loading = true;
     } catch (e) {
       alert('서버오류입니다. 관리자에게 연락주세요.');
     }
@@ -265,11 +273,15 @@ export default Vue.extend({
       try {
         const {
           data: { data },
-        } = await getEvents(1, val - 1, '');
+        } = await getEvents(3, val - 1, '');
         this.$data.events = data.contents;
       } catch (e) {
         alert('서버오류입니다. 관리자에게 연락주세요.');
       }
+    },
+    $route(to) {
+      this.$data.idx = to.params.idx;
+      console.log(this.$data.idx);
     },
   },
 });
@@ -366,7 +378,12 @@ export default Vue.extend({
           text-align: start;
         }
       }
-
+      .clicked {
+        background-color: lightgray;
+      }
+      .not-clicked {
+        background-color: transparent;
+      }
       #loading-wrapper {
         height: 400px;
         display: flex;

@@ -28,6 +28,9 @@ export default new Vuex.Store({
     getAdminEventPage(state: State) {
       return state.page.adminEvent;
     },
+    getUserPage(state: State) {
+      return state.page.user;
+    },
   },
   mutations: {
     SET_PAGE(

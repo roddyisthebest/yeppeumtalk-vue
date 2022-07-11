@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import VueRouter, { RouteConfig } from 'vue-router';
 import store from '../store';
-
+import { setToken } from '@/api';
 Vue.use(VueRouter);
 
 const routes: Array<RouteConfig> = [
@@ -60,7 +60,7 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   const accessToken = store.state.user.accessToken;
-
+  setToken(accessToken as string);
   if ((to.meta?.layout as string) === 'Admin') {
     if (accessToken) {
       next();

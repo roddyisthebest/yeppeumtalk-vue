@@ -37,4 +37,12 @@ type page = {
   user: number | null;
 };
 
-export { response, event, user, page };
+type applicant = {
+  clauseAgree: boolean;
+  createdAt: Date | null;
+  idx: number;
+  name: string;
+  phone: number;
+};
+
+export { response, event, user, page, applicant };
