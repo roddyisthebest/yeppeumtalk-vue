@@ -32,7 +32,7 @@
             <span class="text">인기 이벤트</span>
             <font-awesome-icon icon="fa-solid fa-angle-right" class="icon" />
           </button>
-          <button class="item" @click="goRoute('')">
+          <button class="item" @click="goLinkPage">
             <span class="text">입점/제휴문의</span>
             <font-awesome-icon icon="fa-solid fa-angle-right" class="icon" />
           </button>
@@ -55,9 +55,9 @@
             <span class="text">개인정보처리방침</span>
           </router-link>
           <span class="block"></span>
-          <router-link to="/" class="button">
+          <div @click="goLinkPage" class="button">
             <span class="text">입점/제휴문의</span>
-          </router-link>
+          </div>
         </div>
         <div id="info-wrapper">
           <span class="text"
@@ -78,6 +78,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { useScreen } from 'vue-screen';
+import { getLink } from '@/api/link';
 export default Vue.extend({
   name: 'UserLayoutView',
   data() {
@@ -107,8 +108,19 @@ export default Vue.extend({
       }
       this.setNavigation();
     },
+    goLinkPage() {
+      if (
+        this.$store.state.link.includes('https') ||
+        this.$store.state.link.includes('http')
+      ) {
+        window.open(this.$store.state.link);
+        return;
+      }
+
+      window.open('http://' + this.$store.state.link);
+    },
   },
-  created() {
+  async created() {
     if (this.$route.name === 'home' || this.$route.name === 'privacy') {
       if (this.bottomPadding) {
         this.bottomPadding = false;
@@ -129,6 +141,11 @@ export default Vue.extend({
         }
       }
     });
+
+    const {
+      data: { data },
+    } = await getLink();
+    this.$store.commit('SET_LINK', data);
   },
   watch: {
     $route(to) {
@@ -250,7 +267,7 @@ footer {
       align-items: center;
       justify-content: center;
       text-decoration: none;
-
+      cursor: pointer;
       .text {
         color: #f5f5f5;
         font-size: 15px;

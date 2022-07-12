@@ -107,7 +107,6 @@ export default Vue.extend({
 
       if (plus) {
         this.$store.commit('SET_PAGE', { type: 'userEvent', page: now });
-        console.log(this.totalPage);
         if ((this.totalPage as number) > future) {
           this.pages = [];
           for (let i = now; i < future; i++) {

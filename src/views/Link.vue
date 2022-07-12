@@ -24,7 +24,7 @@ export default Vue.extend({
       const { data } = await getLink();
       this.link = data.data;
     } catch (e: any) {
-      alert(e.response.data.errorMessage);
+      alert('서버오류입니다. 관리자에게 연락주세요.');
     }
   },
   methods: {
@@ -33,9 +33,14 @@ export default Vue.extend({
       const formData = new FormData();
       formData.append('url', this.link);
       try {
-        const { data } = await updateLink(formData);
-      } catch (e) {
-        alert(e.response.data.errorMessage);
+        await updateLink(formData);
+      } catch (e: any) {
+        if (e.response.status === 401 || e.response.status === 400) {
+          alert('토큰이 만료되었습니다! 다시 로그인해주세요.');
+          this.$router.push('/login');
+          return;
+        }
+        alert('서버오류입니다. 관리자에게 연락주세요.');
       }
     },
   },

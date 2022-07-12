@@ -8,6 +8,7 @@ export interface State {
   user: user;
   page: page;
   update: boolean;
+  link: string;
 }
 export default new Vuex.Store({
   state() {
@@ -21,6 +22,7 @@ export default new Vuex.Store({
         user: 1,
       },
       update: false,
+      link: '',
     };
   },
   getters: {
@@ -49,6 +51,9 @@ export default new Vuex.Store({
     },
     SET_UPDATE(state: State, update: boolean) {
       state.update = update;
+    },
+    SET_LINK(state: State, link: string) {
+      state.link = link;
     },
   },
 

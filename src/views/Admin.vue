@@ -263,6 +263,11 @@ export default Vue.extend({
       try {
         await saveEvent(formData);
       } catch (e: any) {
+        if (e.response.status === 401 || e.response.status === 400) {
+          alert('토큰이 만료되었습니다! 다시 로그인해주세요.');
+          this.$router.push('/login');
+          return;
+        }
         alert(e.response.data.errorMessage);
       } finally {
         await this.getData();

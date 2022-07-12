@@ -17,12 +17,7 @@
       <Slide :style="{ paddingBottom: '30px' }" :slides="slides"></Slide>
       <div id="inputWrapper">
         <input type="text" v-model="name" class="input" placeholder="이름" />
-        <input
-          type="number"
-          v-model="phone"
-          class="input"
-          placeholder="연락처"
-        />
+        <input type="text" v-model="phone" class="input" placeholder="연락처" />
         <div id="checkColumn">
           <input type="checkbox" name="color" v-model="clauseAgree" />
           <span id="text">개인정보 처리방침 동의</span>
@@ -72,19 +67,21 @@ export default Vue.extend({
           alert(`개인정보 처리방침에 대해 동의하지 않았습니다.`);
           return;
         }
-        if (this.name.length >= 2 && regPhone.test(this.phone)) {
-          await saveApply(
-            this.$route.params.idx,
-            this.name,
-            this.phone,
-            this.clauseAgree
-          );
-          alert(
-            `${this.name}님! 연락처 ${this.phone} 으로 신청 완료되었습니다.`
-          );
-        } else {
-          alert(`잘못된 입력입니다.`);
+        if (this.name.length < 2) {
+          alert('올바른 형식의 이름을 입력해주세요. (2글자 이상)');
+          return;
         }
+        if (!regPhone.test(this.phone)) {
+          alert('올바른 형식의 전화번호를 입력해주세요.');
+          return;
+        }
+        await saveApply(
+          this.$route.params.idx,
+          this.name,
+          this.phone,
+          this.clauseAgree
+        );
+        alert(`${this.name}님! 연락처 ${this.phone} 으로 신청 완료되었습니다.`);
       } catch (e) {
         alert('서버오류입니다. 관리자에게 연락주세요.');
       } finally {

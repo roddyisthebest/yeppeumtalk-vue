@@ -216,7 +216,12 @@ export default Vue.extend({
           data: { data },
         } = await getApply(this.$route.params.idx, val - 1, 10);
         this.applies = data.contents;
-      } catch (e) {
+      } catch (e: any) {
+        if (e.response.status === 401 || e.response.status === 400) {
+          alert('토큰이 만료되었습니다! 다시 로그인해주세요.');
+          this.$router.push('/login');
+          return;
+        }
         alert('서버오류입니다. 관리자에게 연락주세요.');
       }
     },
@@ -272,7 +277,12 @@ export default Vue.extend({
         await this.setData();
         this.setEdit();
       } catch (e: any) {
-        alert(e.response.data.errorMessage);
+        if (e.response.status === 401 || e.response.status === 400) {
+          alert('토큰이 만료되었습니다! 다시 로그인해주세요.');
+          this.$router.push('/login');
+          return;
+        }
+        alert('서버오류입니다. 관리자에게 연락주세요.');
       } finally {
         this.saveLoading = false;
       }
@@ -284,7 +294,14 @@ export default Vue.extend({
           await this.$store.commit('SET_UPDATE', true);
           await this.$router.push('/admin');
         }
-      } catch (e: any) {}
+      } catch (e: any) {
+        if (e.response.status === 401 || e.response.status === 400) {
+          alert('토큰이 만료되었습니다! 다시 로그인해주세요.');
+          this.$router.push('/login');
+          return;
+        }
+        alert('서버오류입니다. 관리자에게 연락주세요.');
+      }
     },
     async setData() {
       this.$data.pages = [];
@@ -321,7 +338,12 @@ export default Vue.extend({
           this.zero = false;
         }
       } catch (e: any) {
-        alert(e.response.data.errorMessage);
+        if (e.response.status === 401 || e.response.status === 400) {
+          alert('토큰이 만료되었습니다! 다시 로그인해주세요.');
+          this.$router.push('/login');
+          return;
+        }
+        alert('서버오류입니다. 관리자에게 연락주세요.');
       }
     },
     movePage(plus: boolean) {
