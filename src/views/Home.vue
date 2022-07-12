@@ -150,9 +150,13 @@ export default Vue.extend({
       const {
         data: { data },
       } = await getEvents(6, this.$store.state.page.userEvent - 1, '');
+      const {
+        data: { newData },
+      } = await getEvents(6, 0, '');
+
       this.loading = true;
       this.events = data.contents;
-      this.slides = data.contents;
+      this.slides = newData.contents;
       this.totalPage = data.total_page + 1;
 
       if (this.$store.state.page.userEvent !== 1) {
