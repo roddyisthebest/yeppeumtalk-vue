@@ -149,7 +149,7 @@ export default Vue.extend({
     try {
       const {
         data: { data },
-      } = await getEvents(4, this.$store.state.page.userEvent - 1, '');
+      } = await getEvents(6, this.$store.state.page.userEvent - 1, '');
       this.loading = true;
       this.events = data.contents;
       this.slides = data.contents;
@@ -212,7 +212,7 @@ export default Vue.extend({
       try {
         const {
           data: { data },
-        } = await getEvents(4, val - 1, '');
+        } = await getEvents(6, val - 1, '');
         this.events = data.contents;
       } catch (e) {
         alert('서버오류입니다. 관리자에게 연락주세요.');
