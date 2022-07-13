@@ -151,7 +151,7 @@ export default Vue.extend({
         data: { data },
       } = await getEvents(6, this.$store.state.page.userEvent - 1, '');
       const {
-        data: { newData },
+        data: { data: newData },
       } = await getEvents(6, 0, '');
 
       this.loading = true;
@@ -192,7 +192,8 @@ export default Vue.extend({
         }
       }
     } catch (e) {
-      alert('서버오류입니다. 관리자에게 연락주세요.');
+      console.log(e);
+      // alert('서버오류입니다. 관리자에게 연락주세요.');
     }
   },
   computed: {
