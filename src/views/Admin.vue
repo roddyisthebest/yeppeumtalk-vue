@@ -32,7 +32,7 @@
               <span class="text zero">{{ event.idx }}</span>
               <span class="text one">{{ event.title }}</span>
               <span class="text two">{{
-                moment(event.createdAt).format('YYYY-MM-DD HH:MM')
+                event.createdAt.replace('T', ' ')
               }}</span>
             </router-link>
           </template>
@@ -167,7 +167,6 @@ import Vue from 'vue';
 import { getEvents, saveEvent } from '@/api/event';
 import { event } from '@/types/index';
 import Loading from 'vue-loading-overlay';
-import moment from 'moment';
 
 export default Vue.extend({
   name: 'AdminView',
@@ -187,7 +186,6 @@ export default Vue.extend({
       loading: false,
       idx: null as null | number,
       saveLoading: false,
-      moment,
       query: '',
       page: 1 as number,
     };

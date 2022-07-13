@@ -74,12 +74,6 @@ router.beforeEach((to, from, next) => {
   } else {
     next();
   }
-  // next();
-  // if ((to.meta?.layout as string) === 'admin' && accessToken) {
-  //   next();
-  // } else {
-  //   next('/login');
-  // }
 });
 
 export default router;
