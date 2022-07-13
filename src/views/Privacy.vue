@@ -2,9 +2,9 @@
   <div id="container-privacy">
     <div id="content">
       <p class="sub">
-        뷰파트너스(이하 ‘회사’라 합니다)는 인터넷 상에서의 개인정보 보호를 매우
-        중요하게 생각하고 있으며, 이용자가 회사를 이용함에 있어서 회사에 제공한
-        개인정보가 보호받을 수 있도록 최선을 다하고 있습니다.
+        ㈜뷰파트너스(이하 ‘회사’라 합니다)는 인터넷 상에서의 개인정보 보호를
+        매우 중요하게 생각하고 있으며, 이용자가 회사를 이용함에 있어서 회사에
+        제공한 개인정보가 보호받을 수 있도록 최선을 다하고 있습니다.
       </p>
       <p class="sub">
         이에 따라, 회사는 통신비밀보호법, 전기통신사업법, 정보통신망이용촉진
@@ -72,7 +72,10 @@
           있습니다.(서비스 이용기록, 접속 로그, 쿠키, 접속 IP 정보)
         </p>
         <p class="sub">- 다음과 같은 방법으로 개인정보를 수집합니다.</p>
-        <p class="sub">홈페이지(이벤트 신청, 모델 신청), 입점/제휴문의</p>
+        <p class="sub">
+          홈페이지(이벤트 신청, 모델 신청), 입점/제휴문의(상호명, 담당자,
+          전화번호, 이메일)
+        </p>
       </div>
       <div class="contentWrapper">
         <p class="title">2. 개인정보의 수집 및 이용목적</p>
@@ -339,11 +342,9 @@
           회사는 아래와 같이 개인정보 보호책임자를 두고 있습니다.
         </p>
         <p class="sub">[개인정보 보호책임자]</p>
-        <p class="sub">보호 책임자 :</p>
-        <p class="sub">접근 권한자 :</p>
+        <p class="sub">보호 책임자 : 정원준</p>
         <p class="sub">소속 : ㈜뷰파트너스</p>
-        <p class="sub">전화번호 :</p>
-        <p class="sub">이메일 :</p>
+        <p class="sub">이메일 : moyajinjja@gmail.com</p>
         <p class="sub">[개인정보의 암호화]</p>
         <p class="sub">
           귀하께서는 회사의 서비스를 이용하시며 발생하는 모든 개인정보보호 관련
@@ -412,7 +413,7 @@
               <td><span class="table-sub">위탁 계약 종료시까지</span></td>
             </tr>
             <tr>
-              <td><span class="table-sub">㈜카페24</span></td>
+              <td><span class="table-sub">㈜가비아</span></td>
               <td><span class="table-sub">홈페이지 호스팅</span></td>
               <td><span class="table-sub">이름, 휴대전화, 연락처</span></td>
               <td><span class="table-sub">위탁 계약 종료시까지</span></td>
@@ -426,8 +427,8 @@
           후의 개인정보의 반환 또는 파기 의무 등을 규정하고, 이를 준수 하도록
           관리하고 있습니다.
         </p>
-        <p class="sub">공고일자 : 2021년 10월 21일</p>
-        <p class="sub">시행일자 : 2021년 10월 28일</p>
+        <p class="sub">공고일자 : 2022년 07월 01일</p>
+        <p class="sub">시행일자 : 2022년 07월 08일</p>
       </div>
     </div>
   </div>

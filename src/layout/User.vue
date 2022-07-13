@@ -23,7 +23,11 @@
             :src="require('@/assets/img/logo_transparent.png')"
             :style="{ width: '150px' }"
           />
-          <button id="button" @click="setNavigation">
+          <button
+            id="button"
+            @click="setNavigation"
+            :style="{ position: 'initial' }"
+          >
             <font-awesome-icon icon="fa-solid fa-xmark" />
           </button>
         </nav>
@@ -45,6 +49,9 @@
         <button id="button" @click="setNavigation">
           <font-awesome-icon icon="fa-solid fa-bars" />
         </button>
+        <span></span>
+        <router-link to="/" id="homeButton"></router-link>
+        <span></span>
       </nav>
       <div :style="{ paddingTop: '80px', background: '#f5f5f5' }">
         <slot />
@@ -225,6 +232,14 @@ nav {
   padding: 0 15px;
   align-items: center;
   justify-content: space-between;
+  #homeButton {
+    width: 70%;
+    height: 100%;
+    background-color: transparent;
+    border: none;
+    z-index: 101;
+  }
+
   #button {
     width: 50px;
     height: 50px;
@@ -236,6 +251,9 @@ nav {
     color: white;
     font-size: 30px;
     cursor: pointer;
+    position: absolute;
+    top: 15px;
+    z-index: 9999;
   }
 }
 .goUpButton {
