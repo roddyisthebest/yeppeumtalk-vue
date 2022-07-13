@@ -20,8 +20,9 @@
           }"
         >
           <img
+            @click="goRoute('/')"
             :src="require('@/assets/img/logo_transparent.png')"
-            :style="{ width: '150px' }"
+            :style="{ width: '150px', cursor: 'pointer' }"
           />
           <button
             id="button"
