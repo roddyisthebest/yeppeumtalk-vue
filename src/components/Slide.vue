@@ -47,7 +47,7 @@ export default Vue.extend({
       screen: useScreen(),
       power: 410,
       moving: 0,
-      height: '200px',
+      height: '177.5px',
     };
   },
   props: {
@@ -74,7 +74,7 @@ export default Vue.extend({
       this.power = screen.width * 0.8 + 10;
       this.height = '100%';
     } else {
-      this.height = '200px';
+      this.height = '177.5px';
     }
     setInterval(() => {
       this.moving += 1;
@@ -88,7 +88,7 @@ export default Vue.extend({
       } else {
         this.setMove();
       }
-    }, 5000);
+    }, 6800);
   },
   watch: {
     'screen.width': function (width: number) {
@@ -101,7 +101,7 @@ export default Vue.extend({
         this.$data.x = 40;
         this.power = 410;
         this.moving = 0;
-        this.height = '200px';
+        this.height = '177.5px';
       }
     },
   },
